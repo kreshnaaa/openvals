@@ -36,7 +36,7 @@ This is especially critical for:
 
 ---
 
-## 🔷 Core Capabilities
+## Core Capabilities
 
 ### 1. Model Evaluation
 Evaluate model outputs against structured datasets using:
@@ -77,7 +77,7 @@ Trust Score = Σ (wᵢ × mᵢ)
 
 ---
 
-## 📦 Installation
+## Installation
 
     pip install openvals 
 
@@ -167,7 +167,7 @@ openvals/
 ```
 ---
 
-## 🔐 Roadmap
+## Roadmap
 
 ### v0.3
 - [ ] OpenAI / Ollama / HuggingFace adapters
@@ -186,7 +186,7 @@ openvals/
 
 ---
 
-## 🌐 Vision
+## Vision
 
 OpenVals is evolving into:
 
@@ -201,7 +201,7 @@ Where organizations can answer:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome.
 
@@ -211,13 +211,13 @@ Contributions are welcome.
 
 ---
 
-## 📄 License
+## License
 
 MIT License
 
 ---
 
-## 🧠 Backed by
+## Backed by
 
 Developed as part of DrPinnacle’s AI Trust & Validation Initiative, focused on building secure, scalable, and trustworthy AI systems.
 
