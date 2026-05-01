@@ -4,29 +4,35 @@ OpenVals is an open evaluation and benchmarking framework for LLMs, SLMs, and AI
 
     > Evaluate. Benchmark. Trust. Deploy with Confidence.
 
----
-## Badges
 
 ![PyPI](https://img.shields.io/pypi/v/openvals)
-
 ![Python](https://img.shields.io/pypi/pyversions/openvals)
-
 ![License](https://img.shields.io/github/license/vishwanathakuthota/openvals)
-
 ![Repo Size](https://img.shields.io/github/repo-size/vishwanathakuthota/openvals)
-
 ![Last Commit](https://img.shields.io/github/last-commit/vishwanathakuthota/openvals)
 
 ## 🚀 Why OpenVals?
 
-Most AI evaluation tools stop at metrics.
+AI models are powerful—but without proper validation, they are unpredictable, insecure, and hard to trust. Most AI evaluation tools stop at metrics.
 
-OpenVals goes further:
+OpenVals exists to solve that.
+
+It provides a structured way to:
 
 - ✅ Aligns evaluation with business objectives
-- ✅ Enables multi-model benchmarking
-- ✅ Quantifies trust, risk, and performance
 - ✅ Supports deployment decision-making
+- ✅ Quantifies trust, risk, and performance
+- ✅ Evaluate model performance  
+- ✅ Benchmark multiple models  
+- ✅ Normalize and compare results  
+- ✅ Introduce trust before deployment  
+
+This is especially critical for:
+
+- ✅ LLMs and generative AI  
+- ✅ Enterprise AI systems  
+- ✅ Regulated industries  
+- ✅ Security-sensitive environments 
 
 ---
 
@@ -55,12 +61,11 @@ Compare multiple models under the same conditions:
 
 Weighted scoring aligned to business priorities:
 
-[
-\text{Trust Score} = \sum_{i=1}^{n} w_i \cdot m_i
-]
+Trust Score = Σ (wᵢ × mᵢ)
 
-- Customize weights per use case
-- Balance accuracy, cost, and latency
+- Customize weights per use case  
+
+- Balance accuracy, cost, and latency 
 
 ---
 
@@ -74,7 +79,7 @@ Weighted scoring aligned to business priorities:
 
 ## 📦 Installation
 
-bash pip install -e . 
+    pip install openvals 
 
 ---
 
@@ -82,13 +87,13 @@ bash pip install -e .
 
 ### 1. Run Evaluation
 
-bash openvals run --dataset examples/sample_eval.json 
+    openvals run --dataset examples/sample_eval.json 
 
 ---
 
 ### 2. Run Multi-Model Benchmark
 
-bash openvals benchmark --dataset examples/sample_eval.json 
+    openvals benchmark --dataset examples/sample_eval.json 
 
 ---
 
@@ -98,22 +103,68 @@ json [   {     "id": "1",     "input": "hello",     "expected_output": "olleh"  
 
 ---
 
-## 🧠 Python API Usage
+## API Usage
 
-python from openvals.core.evaluator import Evaluator from openvals.models.dummy_model import DummyModel from openvals.datasets.loader import load_dataset  dataset = load_dataset("examples/sample_eval.json") model = DummyModel()  evaluator = Evaluator(model, dataset) result = evaluator.run()  print(result) 
+```python
+from openvals.core.evaluator import Evaluator
+from openvals.models.dummy_model import DummyModel
+from openvals.datasets.loader import load_dataset
 
+dataset = load_dataset("examples/sample_eval.json")
+model = DummyModel()
+
+evaluator = Evaluator(model, dataset)
+result = evaluator.run()
+
+print(result)
+```
 ---
 
-## 🔷 Multi-Model Benchmarking Example
 
-python from openvals.benchmarking.benchmark import BenchmarkRunner from openvals.benchmarking.normalization import normalize_scores from openvals.benchmarking.ranking import rank_models  models = {     "model_a": DummyModel(),     "model_b": DummyModel() }  runner = BenchmarkRunner(models, dataset) results = runner.run()  normalized = normalize_scores(results)  ranking = rank_models(normalized, {     "accuracy": 0.5,     "semantic": 0.3,     "latency": 0.2 })  print(ranking) 
+## Multi-Model Benchmarking Example
+
+```python 
+from openvals.models.dummy_model import DummyModel
+from openvals.benchmarking.benchmark import BenchmarkRunner
+from openvals.benchmarking.normalization import normalize_scores
+from openvals.benchmarking.ranking import rank_models
+
+models = {
+    "model_a": DummyModel(),
+    "model_b": DummyModel()
+}
+
+runner = BenchmarkRunner(models, dataset)
+results = runner.run()
+
+normalized = normalize_scores(results)
+
+ranking = rank_models(normalized, {
+    "accuracy": 0.5,
+    "semantic": 0.3,
+    "latency": 0.2
+})
+
+print(ranking)
+```
 
 ---
 
 ## 🏗️ Project Structure
 
-openvals/ │ ├── core/              # Evaluation engine ├── models/            # Model adapters ├── datasets/          # Dataset loading & schema ├── metrics/           # Evaluation metrics ├── benchmarking/      # Multi-model benchmarking layer ├── scoring/           # Scoring logic ├── safety/            # Risk & safety checks (WIP) ├── reporting/         # Output & reports (WIP) ├── cli.py             # Command-line interface
-
+```tree
+openvals/
+│
+├── core/              # Evaluation engine
+├── models/            # Model adapters
+├── datasets/          # Dataset loading & schema
+├── metrics/           # Evaluation metrics
+├── benchmarking/      # Multi-model benchmarking layer
+├── scoring/           # Scoring logic
+├── safety/            # Risk & safety checks (WIP)
+├── reporting/         # Output & reports (WIP)
+├── cli.py             # Command-line interface
+```
 ---
 
 ## 🔐 Roadmap
