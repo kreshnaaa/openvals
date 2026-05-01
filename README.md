@@ -128,7 +128,7 @@ openvals/ │ ├── core/              # Evaluation engine ├── models/
 
 OpenVals is evolving into:
 
-> A Trust Layer for AI Systems
+    > A Trust Layer for AI Systems
 
 Where organizations can answer:
 
@@ -158,6 +158,8 @@ MIT License
 ## 🧠 Backed by
 
 Developed as part of DrPinnacle’s AI Trust & Validation Initiative, focused on building secure, scalable, and trustworthy AI systems.
+
+openvalidations.com 
 
 ---
 
