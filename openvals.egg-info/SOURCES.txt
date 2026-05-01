@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+setup.py
+openvals/__init__.py
+openvals/cli.py
+openvals.egg-info/PKG-INFO
+openvals.egg-info/SOURCES.txt
+openvals.egg-info/dependency_links.txt
+openvals.egg-info/entry_points.txt
+openvals.egg-info/requires.txt
+openvals.egg-info/top_level.txt
+openvals/core/__init__.py
+openvals/core/evaluator.py
