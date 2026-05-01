@@ -2,9 +2,20 @@
 
 OpenVals is an open evaluation and benchmarking framework for LLMs, SLMs, and AI systems, designed to help organizations measure, compare, and trust AI models before deployment.
 
-> Evaluate. Benchmark. Trust. Deploy with Confidence.
+    > Evaluate. Benchmark. Trust. Deploy with Confidence.
 
 ---
+## Badges
+
+![PyPI](https://img.shields.io/pypi/v/openvals)
+
+![Python](https://img.shields.io/pypi/pyversions/openvals)
+
+![License](https://img.shields.io/github/license/vishwanathakuthota/openvals)
+
+![Repo Size](https://img.shields.io/github/repo-size/vishwanathakuthota/openvals)
+
+![Last Commit](https://img.shields.io/github/last-commit/vishwanathakuthota/openvals)
 
 ## 🚀 Why OpenVals?
 
