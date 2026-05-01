@@ -1,14 +1,25 @@
 Metadata-Version: 2.4
 Name: openvals
-Version: 0.0.2
-Summary: Open evaluation and benchmarking framework for AI systems
+Version: 0.0.5
+Summary: AI evaluation, validation, benchmarking, and security framework
 Author: Vishwanath Akuthota
 License: MIT
+Project-URL: Homepage, https://github.com/vishwanathakuthota/openvals
+Project-URL: Documentation, https://docs.openvalidations.com
+Project-URL: Source, https://github.com/vishwanathakuthota/openvals
+Keywords: ai,llm,evaluation,benchmarking,validation,ml,security
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
-Requires-Dist: numpy
-Requires-Dist: pandas
-Requires-Dist: scikit-learn
+Requires-Dist: numpy>=1.21
+Requires-Dist: pandas>=1.3
+Requires-Dist: scikit-learn>=1.0
 
 # OpenVals
 

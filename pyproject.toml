@@ -1,23 +1,54 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=69.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvals"
-version = "0.0.4""
-description = "Open evaluation and benchmarking framework for AI systems"
+version = "0.0.5"
+description = "AI evaluation, validation, benchmarking, and security framework"
 readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
 authors = [
     { name = "Vishwanath Akuthota" }
 ]
-license = { text = "MIT" }
-requires-python = ">=3.8"
+
+keywords = [
+    "ai",
+    "llm",
+    "evaluation",
+    "benchmarking",
+    "validation",
+    "ml",
+    "security"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
 
 dependencies = [
-    "numpy",
-    "pandas",
-    "scikit-learn"
+    "numpy>=1.21",
+    "pandas>=1.3",
+    "scikit-learn>=1.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/vishwanathakuthota/openvals"
+Documentation = "https://docs.openvalidations.com"
+Source = "https://github.com/vishwanathakuthota/openvals"
 
 [project.scripts]
 openvals = "openvals.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["openvals*"]
+
