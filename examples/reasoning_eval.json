@@ -1,0 +1,22 @@
+[
+  {
+    "id": "r1",
+    "input": "If I have 3 apples and I buy 2 more, then give 1 to a friend, how many apples do I have?",
+    "expected_output": "4"
+  },
+  {
+    "id": "r2",
+    "input": "What is the capital of France?",
+    "expected_output": "Paris"
+  },
+  {
+    "id": "r3",
+    "input": "Does a person have more hair on their head or more fingers on their hands?",
+    "expected_output": "More hair on their head"
+  },
+  {
+    "id": "r4",
+    "input": "Solve for x: 2x + 5 = 15",
+    "expected_output": "5"
+  }
+]

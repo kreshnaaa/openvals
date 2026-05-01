@@ -1,0 +1,14 @@
+weights:
+  accuracy: 0.5
+  semantic: 0.3
+  latency: 0.2
+
+models:
+  - name: llama3-8b
+    type: ollama
+    model_name: llama3:8b
+    base_url: http://192.168.1.117:8006
+  - name: gemma3n:e2b
+    type: ollama
+    model_name: gemma3n:e2b
+    base_url: http://192.168.1.117:8006

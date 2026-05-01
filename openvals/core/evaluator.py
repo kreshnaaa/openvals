@@ -34,7 +34,13 @@ class Evaluator:
 
         n = len(self.dataset)
         avg_metrics = {k: v/n for k, v in agg.items()}
-        score = weighted_score(avg_metrics, self.weights)
+        
+        # Normalize latency for scoring (faster = higher score)
+        # We use 1 / (1 + latency) so that 0s = 1.0, 1s = 0.5, 20s = 0.047, etc.
+        scored_metrics = avg_metrics.copy()
+        scored_metrics["latency"] = 1.0 / (1.0 + avg_metrics["latency"])
+        
+        score = weighted_score(scored_metrics, self.weights)
 
         return {
             "overall_score": score,

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "c1",
+    "input": "Can you explain why the sky is blue in simple terms?",
+    "expected_output": "The sky appears blue because of a phenomenon called Rayleigh scattering. When sunlight reaches Earth's atmosphere, it is scattered in all directions by the gases and particles in the air. Blue light is scattered more than other colors because it travels as shorter, smaller waves."
+  },
+  {
+    "id": "c2",
+    "input": "What are the three main states of matter?",
+    "expected_output": "The three main states of matter are solid, liquid, and gas. Solids have a definite shape and volume, liquids have a definite volume but take the shape of their container, and gases have neither a definite shape nor volume."
+  },
+  {
+    "id": "c3",
+    "input": "How do plants make their own food?",
+    "expected_output": "Plants make their own food through a process called photosynthesis. They use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar (glucose)."
+  }
+]
