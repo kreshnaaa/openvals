@@ -1,14 +1,56 @@
 [
   {
     "input": "Say hello",
-    "expected_output": "hello"
+    "expected_output": "hello",
+    "type": "simple",
+    "evaluation": {
+      "exact_match": false,
+      "semantic_threshold": 0.5
+    }
   },
   {
     "input": "What is AI?",
-    "expected_output": "Artificial Intelligence"
+    "expected_output": "Artificial Intelligence",
+    "type": "qa",
+    "evaluation": {
+      "semantic_threshold": 0.6,
+      "allow_variation": true
+    }
   },
   {
     "input": "Define machine learning",
-    "expected_output": "Machine learning is a subset of AI"
+    "expected_output": "Machine learning is a subset of AI",
+    "type": "qa",
+    "evaluation": {
+      "semantic_threshold": 0.7,
+      "allow_variation": true
+    }
+  },
+  {
+    "input": "What does CPU stand for?",
+    "expected_output": "Central Processing Unit",
+    "type": "classification",
+    "evaluation": {
+      "exact_match": false,
+      "semantic_threshold": 0.8
+    }
+  },
+  {
+    "input": "Translate 'hello' to Spanish",
+    "expected_output": "hola",
+    "type": "translation",
+    "evaluation": {
+      "exact_match": false,
+      "semantic_threshold": 0.8
+    }
+  },
+  {
+    "input": "Write a short explanation of cloud computing",
+    "expected_output": "Cloud computing is the delivery of computing services over the internet",
+    "type": "generation",
+    "evaluation": {
+      "semantic_threshold": 0.6,
+      "allow_variation": true
+    }
   }
 ]

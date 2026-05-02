@@ -1,20 +1,37 @@
-
 def normalize_scores(results):
+    metrics = ["accuracy", "semantic", "latency"]
+
+    # collect values
+    values = {m: [] for m in metrics}
+
+    for model in results:
+        for m in metrics:
+            values[m].append(results[model]["metrics"][m])
+
+    # min-max per metric
+    min_vals = {m: min(values[m]) for m in metrics}
+    max_vals = {m: max(values[m]) for m in metrics}
+
     normalized = {}
-    metric_keys = results[list(results.keys())[0]]["metrics"].keys()
 
-    for metric in metric_keys:
-        values = [results[m]["metrics"][metric] for m in results]
-        min_v, max_v = min(values), max(values)
+    for model in results:
+        normalized[model] = {}
 
-        for model in results:
-            val = results[model]["metrics"][metric]
-            if max_v - min_v == 0:
-                score = 1.0
+        for m in metrics:
+            val = results[model]["metrics"][m]
+            min_v = min_vals[m]
+            max_v = max_vals[m]
+
+            if max_v == min_v:
+                norm = 1.0  # all equal
             else:
-                score = (val - min_v) / (max_v - min_v)
+                if m == "latency":
+                    # 🔥 INVERTED NORMALIZATION
+                    norm = (max_v - val) / (max_v - min_v)
+                else:
+                    # normal case (higher is better)
+                    norm = (val - min_v) / (max_v - min_v)
 
-            normalized.setdefault(model, {})
-            normalized[model][metric] = score
+            normalized[model][m] = norm
 
     return normalized

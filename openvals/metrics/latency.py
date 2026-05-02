@@ -1,10 +1,20 @@
 import time
 
-def measure_latency(func, *args, **kwargs):
+def measure_latency(func, input_text):
     start = time.time()
-    result = func(*args, **kwargs)
+
+    try:
+        output = func(input_text)
+
+        # 🔥 Handle None / bad outputs
+        if output is None:
+            output = ""
+
+    except Exception as e:
+        return f"ERROR: {str(e)}", 0.0
+
     end = time.time()
 
-    latency_ms = (end - start) * 1000  # milliseconds
+    latency_ms = (end - start) * 1000
 
-    return result, latency_ms
+    return output, latency_ms

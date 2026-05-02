@@ -1,15 +1,27 @@
-# openvals/metrics/semantic.py
+def semantic_similarity(output, expected):
+    if not output or not expected:
+        return 0.0
 
-def semantic_similarity(predicted: str, expected: str) -> float:
-    predicted = predicted.lower()
+    output = output.lower()
     expected = expected.lower()
 
-    # ✅ strong signal: expected phrase present
-    if expected in predicted:
+    # perfect containment
+    if expected in output:
         return 1.0
 
-    # ✅ partial match (keyword-level)
-    expected_words = expected.split()
-    match_count = sum(1 for word in expected_words if word in predicted)
+    output_tokens = set(output.split())
+    expected_tokens = set(expected.split())
 
-    return match_count / len(expected_words)
+    if not expected_tokens:
+        return 0.0
+
+    common = output_tokens & expected_tokens
+
+    # F1-style scoring (better than plain ratio)
+    precision = len(common) / len(output_tokens) if output_tokens else 0
+    recall = len(common) / len(expected_tokens)
+
+    if precision + recall == 0:
+        return 0.0
+
+    return 2 * (precision * recall) / (precision + recall)

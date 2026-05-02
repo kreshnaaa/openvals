@@ -4,31 +4,53 @@ from openvals.benchmarking.ranking import rank_models
 from openvals.datasets.loader import load_dataset
 from openvals.models.ollama_model import OllamaModel
 
+
+# 📦 Load dataset
 dataset = load_dataset("examples/sample_eval.json")
 
+# 🤖 Models
 models = {
     "llama2": OllamaModel("llama2"),
     "mistral": OllamaModel("mistral"),
     "llama3": OllamaModel("llama3")
 }
 
-runner = BenchmarkRunner(models, dataset)
+# 🚀 Run benchmark
+runner = BenchmarkRunner(models, dataset, debug=False)
 results = runner.run()
 
+# 🔍 Normalize
 normalized = normalize_scores(results)
 
-ranking = rank_models(normalized, {
-    "accuracy": 0.5,
-    "latency": 0.5
-})
+# 🏆 Ranking using DRS (PRIMARY)
+ranking = sorted(
+    [(m, results[m]["drs_score"]) for m in results],
+    key=lambda x: x[1],
+    reverse=True
+)
+sorted_models = [m[0] for m in ranking]
 
-# ✅ Pretty Table Output
-print("\n=== Benchmark Results ===\n")
-print(f"{'Model':<10} {'Accuracy':<10} {'Latency':<10}")
+# 🧠 Sort models by ranking
+sorted_models = [m[0] for m in ranking]
 
-for model, scores in results.items():
-    print(f"{model:<10} {scores.get('accuracy', 0):<10.2f} {scores.get('latency', 0):<10}")
+# 📊 FINAL TABLE
+print("\n=== MODEL BENCHMARK (DRS Ranked) ===\n")
 
-print("\n=== Ranking ===")
-for i, model in enumerate(ranking, 1):
-    print(f"{i}. {model}")
+print(f"{'Rank':<5} {'Model':<10} {'Acc':<6} {'Sem':<6} {'Rel':<6} {'Safe':<6} {'Cons':<6} {'Var':<6} {'Lat(ms)':<10} {'DRS':<6}")
+
+for i, model_name in enumerate(sorted_models, 1):
+    m = results[model_name]["metrics"]
+    drs = results[model_name]["drs_score"]
+
+    print(
+        f"{i:<5} "
+        f"{model_name:<10} "
+        f"{m['accuracy']:<6.3f} "
+        f"{m['semantic']:<6.3f} "
+        f"{m['reliability']:<6.3f} "
+        f"{m['safety']:<6.3f} "
+        f"{m['consistency']:<6.3f} "
+        f"{m['variance']:<6.3f} "
+        f"{m['latency']:<10.2f} "
+        f"{drs:<6.3f}"
+    )
