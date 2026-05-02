@@ -1,5 +1,14 @@
-
 [
-  {"id": "1", "input": "hello", "expected_output": "olleh"},
-  {"id": "2", "input": "test", "expected_output": "tset"}
+  {
+    "input": "Say hello",
+    "expected_output": "hello"
+  },
+  {
+    "input": "What is AI?",
+    "expected_output": "Artificial Intelligence"
+  },
+  {
+    "input": "Define machine learning",
+    "expected_output": "Machine learning is a subset of AI"
+  }
 ]

@@ -1,8 +1,15 @@
+# openvals/metrics/semantic.py
 
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+def semantic_similarity(predicted: str, expected: str) -> float:
+    predicted = predicted.lower()
+    expected = expected.lower()
 
-def semantic_similarity(a: str, b: str) -> float:
-    vect = CountVectorizer().fit([a, b])
-    vectors = vect.transform([a, b])
-    return cosine_similarity(vectors)[0][1]
+    # ✅ strong signal: expected phrase present
+    if expected in predicted:
+        return 1.0
+
+    # ✅ partial match (keyword-level)
+    expected_words = expected.split()
+    match_count = sum(1 for word in expected_words if word in predicted)
+
+    return match_count / len(expected_words)
