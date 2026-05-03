@@ -187,36 +187,6 @@ result = evaluator.run()
 print(result)
 ```
 ---
-
-
-## Multi-Model Benchmarking Example
-
-```python 
-from openvals.models.dummy_model import DummyModel
-from openvals.benchmarking.benchmark import BenchmarkRunner
-from openvals.benchmarking.normalization import normalize_scores
-from openvals.benchmarking.ranking import rank_models
-
-models = {
-    "model_a": DummyModel(),
-    "model_b": DummyModel()
-}
-
-runner = BenchmarkRunner(models, dataset)
-results = runner.run()
-
-normalized = normalize_scores(results)
-
-ranking = rank_models(normalized, {
-    "accuracy": 0.5,
-    "semantic": 0.3,
-    "latency": 0.2
-})
-
-print(ranking)
-```
-
----
 ## 🏗️ Project Structure
 ```tree
 openvals/
