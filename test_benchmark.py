@@ -54,3 +54,15 @@ for i, model_name in enumerate(sorted_models, 1):
         f"{m['latency']:<10.2f} "
         f"{drs:<6.3f}"
     )
+
+from openvals.recommendation.engine import RecommendationEngine
+
+engine = RecommendationEngine(results)
+
+recommendation = engine.recommend(use_case="customer_support")
+
+print("\n=== RECOMMENDATION ===\n")
+print(f"Best Model : {recommendation['recommended_model']}")
+print(f"Score      : {recommendation['score']}")
+print(f"DRS        : {recommendation['drs']}")
+print(f"Reason     : {recommendation['reason']}")
