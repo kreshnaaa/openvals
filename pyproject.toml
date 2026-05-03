@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "openvals"
 version = "0.1.0"
-description = "AI evaluation, validation, benchmarking, security Recommendation Engine"
+description = "Open source AI evaluation, validation, benchmarking, security recommendation Engine and trust layer for LLMs (OpenAI, Claude, Ollama, Gemini)" 
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -15,21 +15,28 @@ authors = [
 ]
 
 keywords = [
-    "ai",
-    "llm",
-    "evaluation",
-    "benchmarking",
-    "validation",
-    "ml",
-    "security"
+    "AI evaluation",
+    "LLM benchmarking",
+    "model validation",
+    "AI safety",
+    "AI reliability",
+    "LLM testing",
+    "AI metrics",
+    "machine learning evaluation",
+    "AI benchmarking tools",
+    "OpenAI evaluation",
+    "Ollama benchmarking",
+    "Claude evaluation",
+    "Gemini AI testing",
+    "Vishwanath Akuthota"
 ]
 
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Testing :: AI Testing :: AI Development :: AI Quality",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
