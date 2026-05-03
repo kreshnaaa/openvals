@@ -5,7 +5,7 @@ OpenVals is an the evaluation + trust infrastructure for LLMs, SLMs, local AI, p
     > Evaluate. Benchmark. Trust. Deploy with Confidence.
 
 
-![PyPI](https://img.shields.io/pypi/v/openvals)
+![PyPI - Version](https://img.shields.io/pypi/v/openvals)
 ![Python](https://img.shields.io/pypi/pyversions/openvals)
 ![License](https://img.shields.io/github/license/vishwanathakuthota/openvals)
 ![Repo Size](https://img.shields.io/github/repo-size/vishwanathakuthota/openvals)
