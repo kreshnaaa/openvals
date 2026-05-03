@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvals"
-version = "0.0.5"
-description = "AI evaluation, validation, benchmarking, and security framework"
+version = "0.1.0"
+description = "AI evaluation, validation, benchmarking, security Recommendation Engine"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
