@@ -1,8 +1,4 @@
-from openvals.safety.safety_engine import (
-    compute_safety_score
-)
-
+from openvals.safety.safety_engine import safety_engine
 
 def safety(output):
-
-    return compute_safety_score(output)
+    return safety_engine(output)

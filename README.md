@@ -60,6 +60,10 @@ DRS helps organizations move beyond leaderboard-style benchmarking toward deploy
 
 DRS combines traditional evaluation metrics with embedding-powered semantic intelligence to better reflect real-world AI performance and deployment reliability.
 
+$$
+Score = \sum_{i=1}^{n}(w_i \times m_i)
+$$
+
 ### 1. Model Evaluation
 Evaluate model outputs against structured datasets using:
 
