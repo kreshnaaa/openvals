@@ -1,4 +1,4 @@
-__version__ = "0.0.3"
+__version__ = "0.2.0"
 
 from .core.evaluator import Evaluator
 from .benchmarking.benchmark import BenchmarkRunner

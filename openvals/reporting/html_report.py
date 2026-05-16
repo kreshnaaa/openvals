@@ -1,6 +1,9 @@
 from datetime import datetime
-import plotly.graph_objects as go
-import plotly.express as px
+import os
+
+from openvals.reporting.charts import (
+    generate_all_charts
+)
 
 # =========================================================
 # TRUST CLASSIFICATION
@@ -35,124 +38,6 @@ def metric_status(value, high=0.8, medium=0.6):
 
     return "🔴"
 
-# =========================================================
-# RADAR CHART
-# =========================================================
-
-def build_radar_chart(results):
-
-    fig = go.Figure()
-
-    metrics_order = [
-        "accuracy",
-        "semantic",
-        "reliability",
-        "safety",
-        "consistency"
-    ]
-
-    for model, data in results.items():
-
-        m = data.get("metrics", {})
-
-        values = [
-            m.get(metric, 0)
-            for metric in metrics_order
-        ]
-
-        # Close radar loop
-        values.append(values[0])
-
-        categories = metrics_order + [metrics_order[0]]
-
-        fig.add_trace(
-            go.Scatterpolar(
-                r=values,
-                theta=categories,
-                fill='toself',
-                name=model
-            )
-        )
-
-    fig.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 1]
-            )
-        ),
-        showlegend=True,
-        title="Model Capability Radar"
-    )
-
-    return fig.to_html(
-        full_html=False,
-        include_plotlyjs='cdn'
-    )
-
-# =========================================================
-# DRS BAR CHART
-# =========================================================
-
-def build_drs_chart(results):
-
-    models = []
-    scores = []
-
-    for model, data in results.items():
-
-        models.append(model)
-        scores.append(
-            data.get("drs_score", 0)
-        )
-
-    fig = px.bar(
-        x=models,
-        y=scores,
-        labels={
-            "x": "Models",
-            "y": "DRS Score"
-        },
-        title="DRS Comparison"
-    )
-
-    return fig.to_html(
-        full_html=False,
-        include_plotlyjs=False
-    )
-
-# =========================================================
-# LATENCY CHART
-# =========================================================
-
-def build_latency_chart(results):
-
-    models = []
-    latency = []
-
-    for model, data in results.items():
-
-        m = data.get("metrics", {})
-
-        models.append(model)
-        latency.append(
-            m.get("latency", 0)
-        )
-
-    fig = px.bar(
-        x=models,
-        y=latency,
-        labels={
-            "x": "Models",
-            "y": "Latency (ms)"
-        },
-        title="Latency Comparison"
-    )
-
-    return fig.to_html(
-        full_html=False,
-        include_plotlyjs=False
-    )
 
 # =========================================================
 # GENERATE HTML REPORT
@@ -161,7 +46,8 @@ def build_latency_chart(results):
 def generate_html_report(
     results,
     recommendation,
-    output_file="report.html"
+    output_file="report.html",
+    charts_dir="charts"
 ):
 
     # =====================================================
@@ -189,22 +75,65 @@ def generate_html_report(
     )
 
     # =====================================================
+    # CREATE DIRECTORIES
+    # =====================================================
+
+    output_dir = os.path.dirname(
+        os.path.abspath(output_file)
+    )
+
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+
+    charts_path = os.path.join(
+        output_dir,
+        charts_dir
+    )
+
+    os.makedirs(charts_path, exist_ok=True)
+
+    # =====================================================
+    # GENERATE CHARTS
+    # =====================================================
+
+    chart_files = generate_all_charts(
+        results,
+        charts_path
+    )
+
+    # =====================================================
+    # RELATIVE IMAGE PATHS
+    # =====================================================
+
+    radar_chart = f"{charts_dir}/radar_chart.png"
+
+    latency_chart = f"{charts_dir}/latency_chart.png"
+
+    drs_chart = f"{charts_dir}/drs_chart.png"
+
+    # =====================================================
     # SORT MODELS
     # =====================================================
 
     ranked = sorted(
         results.items(),
-        key=lambda x: x[1].get("drs_score", 0),
+        key=lambda x: x[1].get(
+            "drs_score",
+            0
+        ),
         reverse=True
     )
-    
+
     # =====================================================
     # BUILD TABLE ROWS
     # =====================================================
 
     rows = ""
 
-    for i, (model, data) in enumerate(ranked, 1):
+    for i, (model, data) in enumerate(
+        ranked,
+        1
+    ):
 
         m = data.get("metrics", {})
 
@@ -252,7 +181,9 @@ def generate_html_report(
             </td>
 
             <td>
-                <b>{data.get('drs_score', 0):.3f}</b>
+                <b>
+                    {data.get('drs_score', 0):.3f}
+                </b>
             </td>
 
         </tr>
@@ -344,7 +275,12 @@ def generate_html_report(
         "summary",
         f"""
         OpenVals recommends
-        <b>{recommendation.get('recommended_model', 'Unknown')}</b>
+        <b>
+            {recommendation.get(
+                'recommended_model',
+                'Unknown'
+            )}
+        </b>
         based on DRS performance,
         semantic capability,
         operational reliability,
@@ -359,14 +295,7 @@ def generate_html_report(
     timestamp = datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S"
     )
-    # =====================================================
-    # GENERATE CHARTS
-    # =====================================================
 
-    radar_chart = build_radar_chart(results)
-    drs_chart = build_drs_chart(results)
-    latency_chart = build_latency_chart(results)
-        
     # =====================================================
     # HTML TEMPLATE
     # =====================================================
@@ -376,7 +305,9 @@ def generate_html_report(
 
     <head>
 
-        <title>OpenVals AI Evaluation Report</title>
+        <title>
+            OpenVals AI Evaluation Report
+        </title>
 
         <style>
 
@@ -412,20 +343,25 @@ def generate_html_report(
                 padding: 24px;
                 margin-bottom: 25px;
                 border-radius: 14px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-                border-left: 6px solid #4f46e5;
+                box-shadow:
+                    0 4px 12px rgba(0,0,0,0.08);
+                border-left:
+                    6px solid #4f46e5;
             }}
 
             .warning {{
-                border-left: 6px solid #ef4444;
+                border-left:
+                    6px solid #ef4444;
             }}
 
             .success {{
-                border-left: 6px solid #16a34a;
+                border-left:
+                    6px solid #16a34a;
             }}
 
             .info {{
-                border-left: 6px solid #0284c7;
+                border-left:
+                    6px solid #0284c7;
             }}
 
             .highlight {{
@@ -461,7 +397,8 @@ def generate_html_report(
 
             td {{
                 padding: 12px;
-                border-bottom: 1px solid #e5e7eb;
+                border-bottom:
+                    1px solid #e5e7eb;
                 text-align: center;
                 background: white;
             }}
@@ -486,6 +423,15 @@ def generate_html_report(
                 text-align: center;
             }}
 
+            .chart {{
+                width: 100%;
+                max-width: 850px;
+                margin-top: 20px;
+                border-radius: 10px;
+                border:
+                    1px solid #e5e7eb;
+            }}
+
             .footer {{
                 text-align: center;
                 margin-top: 40px;
@@ -495,7 +441,8 @@ def generate_html_report(
 
             hr {{
                 border: none;
-                border-top: 1px solid #e5e7eb;
+                border-top:
+                    1px solid #e5e7eb;
                 margin: 20px 0;
             }}
 
@@ -505,7 +452,9 @@ def generate_html_report(
 
     <body>
 
-        <h1>OpenVals AI Evaluation Report</h1>
+        <h1>
+            OpenVals AI Evaluation Report
+        </h1>
 
         <div class="subtitle">
             Generated on {timestamp}
@@ -515,12 +464,17 @@ def generate_html_report(
 
         <div class="card success">
 
-            <h2>Executive Summary</h2>
+            <h2>
+                Executive Summary
+            </h2>
 
-            <p>{summary}</p>
+            <p>
+                {summary}
+            </p>
 
             <div class="trust">
-                Trust Classification: {trust}
+                Trust Classification:
+                {trust}
             </div>
 
         </div>
@@ -529,53 +483,159 @@ def generate_html_report(
 
         <div class="card">
 
-            <h2>AI Advisor Recommendation</h2>
+            <h2>
+                AI Advisor Recommendation
+            </h2>
 
             <p>
-                <b>Recommended Model:</b>
+
+                <b>
+                    Recommended Model:
+                </b>
 
                 <span class="highlight">
-                    {recommendation.get('recommended_model', 'Unknown')}
+                    {
+                        recommendation.get(
+                            'recommended_model',
+                            'Unknown'
+                        )
+                    }
                 </span>
+
             </p>
 
             <div class="metric-box">
+
                 <b>Score</b><br>
-                {recommendation.get('score', 0)}
+
+                {
+                    recommendation.get(
+                        'score',
+                        0
+                    )
+                }
+
             </div>
 
             <div class="metric-box">
+
                 <b>DRS</b><br>
-                {recommendation.get('drs', 0)}
+
+                {
+                    recommendation.get(
+                        'drs',
+                        0
+                    )
+                }
+
             </div>
 
             <div class="metric-box">
+
                 <b>Confidence</b><br>
-                {recommendation.get('confidence', 0)}
+
+                {
+                    recommendation.get(
+                        'confidence',
+                        0
+                    )
+                }
+
             </div>
 
             <hr>
 
             <p>
-                <b>Why Recommended:</b><br>
-                {recommendation.get('reason', 'No reason provided')}
+
+                <b>
+                    Why Recommended:
+                </b><br>
+
+                {
+                    recommendation.get(
+                        'reason',
+                        'No reason provided'
+                    )
+                }
+
             </p>
 
             <p>
-                <b>Trade-offs:</b><br>
-                {recommendation.get('tradeoffs', 'None')}
+
+                <b>
+                    Trade-offs:
+                </b><br>
+
+                {
+                    recommendation.get(
+                        'tradeoffs',
+                        'None'
+                    )
+                }
+
             </p>
 
         </div>
 
-        <!-- DEPLOYMENT READINESS -->
+        <!-- VISUAL ANALYTICS -->
 
         <div class="card">
 
-            <h2>Deployment Readiness Intelligence</h2>
+            <h2>
+                Visual Intelligence Dashboard
+            </h2>
+
+            <h3>
+                Radar Analysis
+            </h3>
+
+            <img
+                src="{radar_chart}"
+                class="chart"
+                alt="Radar Chart"
+            >
+
+            <hr>
+
+            <h3>
+                Latency Comparison
+            </h3>
+
+            <img
+                src="{latency_chart}"
+                class="chart"
+                alt="Latency Chart"
+            >
+
+            <hr>
+
+            <h3>
+                DRS Comparison
+            </h3>
+
+            <img
+                src="{drs_chart}"
+                class="chart"
+                alt="DRS Chart"
+            >
+
+        </div>
+
+        <!-- DEPLOYMENT -->
+
+        <div class="card">
+
+            <h2>
+                Deployment Readiness
+            </h2>
 
             <div class="deployment">
-                {deployment.get("readiness", "Unknown")}
+                {
+                    deployment.get(
+                        "readiness",
+                        "Unknown"
+                    )
+                }
             </div>
 
             <ul>
@@ -588,7 +648,9 @@ def generate_html_report(
 
         <div class="card info">
 
-            <h2>Operational Insights</h2>
+            <h2>
+                Operational Insights
+            </h2>
 
             <ul>
                 {insights_html}
@@ -596,11 +658,13 @@ def generate_html_report(
 
         </div>
 
-        <!-- TRADEOFF DETAILS -->
+        <!-- TRADEOFFS -->
 
         <div class="card">
 
-            <h2>⚖️ Tradeoff Analysis</h2>
+            <h2>
+                ⚖️ Tradeoff Analysis
+            </h2>
 
             <ul>
                 {tradeoffs_detail_html}
@@ -612,7 +676,9 @@ def generate_html_report(
 
         <div class="card warning">
 
-            <h2>Risk Analysis</h2>
+            <h2>
+                Risk Analysis
+            </h2>
 
             <ul>
                 {risks_html}
@@ -624,35 +690,28 @@ def generate_html_report(
 
         <div class="card warning">
 
-            <h2>Detected Anomalies</h2>
+            <h2>
+                Detected Anomalies
+            </h2>
 
             <ul>
                 {anomalies_html}
             </ul>
 
         </div>
-        <!-- VISUAL ANALYTICS -->
-        <div class="card">
-            <h2>Visual Analytics</h2>
-            <h3>Capability Radar</h3>
-            {radar_chart}
-            <hr>
-            <h3>DRS Comparison</h3>
-            {drs_chart}
-            <hr>
-            <h3>Latency Comparison</h3>
-            {latency_chart}
-        </div>
 
         <!-- LEADERBOARD -->
 
         <div class="card">
 
-            <h2>Model Leaderboard</h2>
+            <h2>
+                Model Leaderboard
+            </h2>
 
             <table>
 
                 <tr>
+
                     <th>Rank</th>
                     <th>Model</th>
                     <th>Accuracy</th>
@@ -663,6 +722,7 @@ def generate_html_report(
                     <th>Variance</th>
                     <th>Latency(ms)</th>
                     <th>DRS</th>
+
                 </tr>
 
                 {rows}
@@ -675,7 +735,10 @@ def generate_html_report(
 
         <div class="footer">
 
-            Built with OpenVals • AI Trust & Validation Framework<br><br>
+            Built with OpenVals •
+            AI Trust & Validation Framework
+
+            <br><br>
 
             Developed by DrPinnacle
 
@@ -687,10 +750,18 @@ def generate_html_report(
     """
 
     # =====================================================
-    # SAVE FILE
+    # SAVE HTML REPORT
     # =====================================================
 
-    with open(output_file, "w", encoding="utf-8") as f:
+    with open(
+        output_file,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
         f.write(html)
 
-    print(f"HTML report generated: {output_file}")
+    print(
+        f"✅ HTML report generated: "
+        f"{output_file}"
+    )

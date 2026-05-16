@@ -1,4 +1,5 @@
 import typer
+from pathlib import Path
 
 from openvals.datasets.loader import load_builtin_dataset
 from openvals.datasets.metadata import load_dataset_metadata
@@ -13,6 +14,10 @@ from openvals.benchmarking.benchmark import BenchmarkRunner
 from openvals.recommendation.engine import RecommendationEngine
 
 from openvals.reporting.html_report import generate_html_report
+
+from openvals.utils.paths import (
+    create_output_structure
+)
 
 
 app = typer.Typer(
@@ -65,7 +70,7 @@ def benchmark(
     ),
 
     output: str = typer.Option(
-        "report.html",
+        "outputs/report.html",
         help="Output HTML report file"
     )
 
@@ -75,6 +80,21 @@ def benchmark(
     """
 
     typer.echo("\n🚀 OpenVals Benchmark Starting...\n")
+
+
+    # =====================================================
+    # CREATE OUTPUT STRUCTURE
+    # =====================================================
+
+    create_output_structure()
+
+    output_path = Path(output)
+
+    if not output_path.parent.exists():
+        output_path.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
 
 
     # =====================================================
@@ -187,7 +207,7 @@ def benchmark(
 
     print(
         f"{'Rank':<5} "
-        f"{'Model':<12} "
+        f"{'Model':<15} "
         f"{'Acc':<8} "
         f"{'Sem':<8} "
         f"{'Rel':<8} "
@@ -198,7 +218,7 @@ def benchmark(
         f"{'DRS':<8}"
     )
 
-    print("-" * 95)
+    print("-" * 105)
 
     for rank, (model_name, drs_score) in enumerate(
         ranking,
@@ -209,7 +229,7 @@ def benchmark(
 
         print(
             f"{rank:<5} "
-            f"{model_name:<12} "
+            f"{model_name:<15} "
             f"{metrics['accuracy']:<8.3f} "
             f"{metrics['semantic']:<8.3f} "
             f"{metrics['reliability']:<8.3f} "
@@ -230,6 +250,7 @@ def benchmark(
     recommendation = engine.recommend(
         use_case=dataset
     )
+
 
     # =====================================================
     # AI ADVISOR REPORT
@@ -310,15 +331,30 @@ def benchmark(
 
     if report:
 
+        typer.echo(
+            "\n📄 Generating enterprise HTML report..."
+        )
+
         generate_html_report(
-            results,
-            recommendation,
-            output_file=output
+            results=results,
+            recommendation=recommendation,
+            output_file=str(output_path)
         )
 
         typer.echo(
-            f"\n✅ HTML report generated: "
-            f"{output}"
+            f"\n✅ HTML report generated:"
+        )
+
+        typer.echo(
+            f"📁 {output_path.resolve()}"
+        )
+
+        typer.echo(
+            "\n📊 Charts saved under:"
+        )
+
+        typer.echo(
+            "📁 outputs/charts/"
         )
 
 
