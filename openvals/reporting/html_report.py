@@ -1,5 +1,6 @@
 from datetime import datetime
-
+import plotly.graph_objects as go
+import plotly.express as px
 
 # =========================================================
 # TRUST CLASSIFICATION
@@ -34,6 +35,124 @@ def metric_status(value, high=0.8, medium=0.6):
 
     return "🔴"
 
+# =========================================================
+# RADAR CHART
+# =========================================================
+
+def build_radar_chart(results):
+
+    fig = go.Figure()
+
+    metrics_order = [
+        "accuracy",
+        "semantic",
+        "reliability",
+        "safety",
+        "consistency"
+    ]
+
+    for model, data in results.items():
+
+        m = data.get("metrics", {})
+
+        values = [
+            m.get(metric, 0)
+            for metric in metrics_order
+        ]
+
+        # Close radar loop
+        values.append(values[0])
+
+        categories = metrics_order + [metrics_order[0]]
+
+        fig.add_trace(
+            go.Scatterpolar(
+                r=values,
+                theta=categories,
+                fill='toself',
+                name=model
+            )
+        )
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 1]
+            )
+        ),
+        showlegend=True,
+        title="Model Capability Radar"
+    )
+
+    return fig.to_html(
+        full_html=False,
+        include_plotlyjs='cdn'
+    )
+
+# =========================================================
+# DRS BAR CHART
+# =========================================================
+
+def build_drs_chart(results):
+
+    models = []
+    scores = []
+
+    for model, data in results.items():
+
+        models.append(model)
+        scores.append(
+            data.get("drs_score", 0)
+        )
+
+    fig = px.bar(
+        x=models,
+        y=scores,
+        labels={
+            "x": "Models",
+            "y": "DRS Score"
+        },
+        title="DRS Comparison"
+    )
+
+    return fig.to_html(
+        full_html=False,
+        include_plotlyjs=False
+    )
+
+# =========================================================
+# LATENCY CHART
+# =========================================================
+
+def build_latency_chart(results):
+
+    models = []
+    latency = []
+
+    for model, data in results.items():
+
+        m = data.get("metrics", {})
+
+        models.append(model)
+        latency.append(
+            m.get("latency", 0)
+        )
+
+    fig = px.bar(
+        x=models,
+        y=latency,
+        labels={
+            "x": "Models",
+            "y": "Latency (ms)"
+        },
+        title="Latency Comparison"
+    )
+
+    return fig.to_html(
+        full_html=False,
+        include_plotlyjs=False
+    )
 
 # =========================================================
 # GENERATE HTML REPORT
@@ -78,7 +197,7 @@ def generate_html_report(
         key=lambda x: x[1].get("drs_score", 0),
         reverse=True
     )
-
+    
     # =====================================================
     # BUILD TABLE ROWS
     # =====================================================
@@ -240,7 +359,14 @@ def generate_html_report(
     timestamp = datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S"
     )
+    # =====================================================
+    # GENERATE CHARTS
+    # =====================================================
 
+    radar_chart = build_radar_chart(results)
+    drs_chart = build_drs_chart(results)
+    latency_chart = build_latency_chart(results)
+        
     # =====================================================
     # HTML TEMPLATE
     # =====================================================
@@ -504,6 +630,18 @@ def generate_html_report(
                 {anomalies_html}
             </ul>
 
+        </div>
+        <!-- VISUAL ANALYTICS -->
+        <div class="card">
+            <h2>Visual Analytics</h2>
+            <h3>Capability Radar</h3>
+            {radar_chart}
+            <hr>
+            <h3>DRS Comparison</h3>
+            {drs_chart}
+            <hr>
+            <h3>Latency Comparison</h3>
+            {latency_chart}
         </div>
 
         <!-- LEADERBOARD -->
