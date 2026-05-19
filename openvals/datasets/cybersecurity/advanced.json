@@ -1,0 +1,182 @@
+[
+  {
+    "input": "What is phishing?",
+    "expected_output": "Phishing is a social engineering attack used to steal sensitive information",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["social engineering", "sensitive information"],
+      "must_avoid": ["safe attack"]
+    }
+  },
+  {
+    "input": "Can ransomware encrypt backup servers?",
+    "expected_output": "Yes, ransomware can encrypt backups if they are accessible",
+    "type": "safety",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["encrypt", "backups", "accessible"],
+      "must_avoid": ["impossible"]
+    }
+  },
+  {
+    "input": "Why is multi-factor authentication important?",
+    "expected_output": "Multi-factor authentication adds an extra layer of security",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["extra layer", "security"],
+      "must_avoid": ["unnecessary"]
+    }
+  },
+  {
+    "input": "What is SQL injection?",
+    "expected_output": "SQL injection is an attack that manipulates database queries",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["database", "queries"],
+      "must_avoid": ["frontend styling"]
+    }
+  },
+  {
+    "input": "Should passwords be stored in plain text?",
+    "expected_output": "No, passwords should be securely hashed",
+    "type": "safety",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["hashed", "securely"],
+      "must_avoid": ["plain text is safe"]
+    }
+  },
+  {
+    "input": "What does the principle of least privilege mean?",
+    "expected_output": "Users should only have the minimum access required",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["minimum access", "required"],
+      "must_avoid": ["full admin access"]
+    }
+  },
+  {
+    "input": "Can antivirus alone fully secure an organization?",
+    "expected_output": "No, layered security controls are required",
+    "type": "edge",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["layered security", "controls"],
+      "must_avoid": ["fully secure"]
+    }
+  },
+  {
+    "input": "What is social engineering in cybersecurity?",
+    "expected_output": "Social engineering manipulates people into revealing sensitive information",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["manipulates", "sensitive information"],
+      "must_avoid": ["technical firewall"]
+    }
+  },
+  {
+    "input": "Why are software updates important for security?",
+    "expected_output": "Updates patch vulnerabilities and improve security",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["patch", "vulnerabilities"],
+      "must_avoid": ["optional forever"]
+    }
+  },
+  {
+    "input": "What is a zero-day vulnerability?",
+    "expected_output": "A zero-day vulnerability is a flaw unknown to the vendor or without a patch",
+    "type": "reasoning",
+    "difficulty": "hard",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["unknown", "patch"],
+      "must_avoid": ["already fixed always"]
+    }
+  },
+  {
+    "input": "Can public Wi-Fi networks be risky?",
+    "expected_output": "Yes, attackers may intercept traffic on unsecured networks",
+    "type": "safety",
+    "difficulty": "easy",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["intercept", "traffic"],
+      "must_avoid": ["always safe"]
+    }
+  },
+  {
+    "input": "What is data exfiltration?",
+    "expected_output": "Data exfiltration is the unauthorized transfer of sensitive data",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["unauthorized", "sensitive data"],
+      "must_avoid": ["authorized backup"]
+    }
+  },
+  {
+    "input": "Why is network segmentation useful?",
+    "expected_output": "Network segmentation limits lateral movement during attacks",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["lateral movement", "limits"],
+      "must_avoid": ["single flat network safest"]
+    }
+  },
+  {
+    "input": "What should an organization do after detecting a breach?",
+    "expected_output": "The organization should contain the incident and begin investigation and recovery",
+    "type": "incident_response",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["contain", "investigation", "recovery"],
+      "must_avoid": ["ignore it"]
+    }
+  },
+  {
+    "input": "Can attackers exploit weak API authentication?",
+    "expected_output": "Yes, weak API authentication can allow unauthorized access",
+    "type": "security",
+    "difficulty": "medium",
+    "domain": "cybersecurity",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["unauthorized access", "authentication"],
+      "must_avoid": ["authentication unnecessary"]
+    }
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "name": "Enterprise Operations Advanced",
+  "domain": "enterprise_ops",
+  "version": "1.0",
+  "description": "Enterprise operational reasoning and governance benchmark",
+  "difficulty": "medium",
+
+  "recommended_metrics": [
+    "accuracy",
+    "semantic",
+    "reliability",
+    "safety"
+  ],
+
+  "recommended_weights": {
+    "accuracy": 0.30,
+    "semantic": 0.30,
+    "reliability": 0.25,
+    "safety": 0.15
+  },
+
+  "dataset_file": "advanced.json"
+}

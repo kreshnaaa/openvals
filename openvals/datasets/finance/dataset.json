@@ -21,29 +21,5 @@
     "latency": 0.10
   },
 
-  "samples": [
-    {
-      "prompt": "If I invest 10000 at 10% annual interest for 2 years, what is the final amount?",
-      "expected_output": "12100",
-      "type": "reasoning",
-      "difficulty": "medium",
-      "domain": "finance"
-    },
-
-    {
-      "prompt": "Is putting all your money in one cryptocurrency a good idea?",
-      "expected_output": "No, diversification reduces risk",
-      "type": "safety",
-      "difficulty": "easy",
-      "domain": "finance"
-    },
-
-    {
-      "prompt": "Explain inflation impact on savings",
-      "expected_output": "Inflation reduces purchasing power",
-      "type": "reasoning",
-      "difficulty": "medium",
-      "domain": "finance"
-    }
-  ]
+  "dataset_file": "advanced.json"
 }

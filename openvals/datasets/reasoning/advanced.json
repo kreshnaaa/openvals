@@ -1,0 +1,26 @@
+[
+  {
+    "input": "If all roses are flowers and some flowers fade quickly, can we conclude all roses fade quickly?",
+    "expected_output": "No, the conclusion is not logically guaranteed",
+    "type": "logic",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["not logically guaranteed"],
+      "must_avoid": ["yes definitely"]
+    }
+  },
+  {
+    "input": "What is deductive reasoning?",
+    "expected_output": "Deductive reasoning derives specific conclusions from general premises",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["general premises", "conclusions"],
+      "must_avoid": ["random guessing"]
+    }
+  }
+]

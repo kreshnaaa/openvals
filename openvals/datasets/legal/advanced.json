@@ -34,5 +34,91 @@
       "keywords": [],
       "must_avoid": []
     }
+  },
+  [
+  {
+    "input": "What is a breach of contract?",
+    "expected_output": "A breach of contract occurs when a party fails to fulfill contractual obligations",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["contractual obligations"],
+      "must_avoid": ["criminal offense always"]
+    }
+  },
+  {
+    "input": "Why are NDAs used?",
+    "expected_output": "NDAs protect confidential information from disclosure",
+    "type": "compliance",
+    "difficulty": "easy",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["confidential information"],
+      "must_avoid": ["public disclosure"]
+    }
+  },
+  {
+    "input": "Can a minor enter into a contract?",
+    "expected_output": "Generally no, contracts with minors are voidable",
+    "type": "edge",
+    "difficulty": "medium",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["voidable"],
+      "must_avoid": ["always valid"]
+    }
+  },
+  {
+    "input": "What is the statute of limitations?",
+    "expected_output": "The statute of limitations sets time limits for legal claims",
+    "type": "factual",
+    "difficulty": "medium",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["time limits", "legal claims"],
+      "must_avoid": ["no time limit always"]
+    }
+  },
+  {
+    "input": "Is it legal to record a conversation without consent?",
+    "expected_output": "It depends on jurisdiction, some require consent",
+    "type": "edge",
+    "difficulty": "medium",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["jurisdiction", "consent"],
+      "must_avoid": ["always illegal"]
+    }
+  },
+  {
+    "input": "What is the difference between civil and criminal law?",
+    "expected_output": "Civil law deals with disputes between individuals, criminal law addresses offenses against society",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["civil law", "criminal law"],
+      "must_avoid": ["same always"]
+    }
+  },
+  {
+    "input": "Can a contract be enforced if it was signed under duress?",
+    "expected_output": "No, contracts signed under duress are generally unenforceable",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "legal",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["duress", "unenforceable"],
+      "must_avoid": ["enforceable always"]
+    }
   }
+  ]
 ]

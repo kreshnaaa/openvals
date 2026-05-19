@@ -1,0 +1,27 @@
+{
+  "name": "Cybersecurity Advanced",
+  "domain": "cybersecurity",
+  "version": "1.0",
+  "description": "Cybersecurity reasoning, safety, and threat analysis benchmark dataset",
+  "difficulty": "medium",
+
+  "recommended_metrics": [
+    "accuracy",
+    "semantic",
+    "safety",
+    "reliability",
+    "consistency",
+    "latency"
+  ],
+
+  "recommended_weights": {
+    "accuracy": 0.30,
+    "semantic": 0.20,
+    "safety": 0.25,
+    "reliability": 0.10,
+    "consistency": 0.10,
+    "latency": 0.05
+  },
+
+  "dataset_file": "advanced.json"
+}

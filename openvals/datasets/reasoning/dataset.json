@@ -1,0 +1,23 @@
+{
+  "name": "Reasoning Advanced",
+  "domain": "reasoning",
+  "version": "1.0",
+  "description": "Logical reasoning and critical thinking benchmark",
+  "difficulty": "medium",
+
+  "recommended_metrics": [
+    "accuracy",
+    "semantic",
+    "consistency",
+    "reliability"
+  ],
+
+  "recommended_weights": {
+    "accuracy": 0.40,
+    "semantic": 0.25,
+    "consistency": 0.20,
+    "reliability": 0.15
+  },
+
+  "dataset_file": "advanced.json"
+}

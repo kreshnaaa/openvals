@@ -1,0 +1,74 @@
+[
+  {
+    "input": "Why is change management important in enterprises?",
+    "expected_output": "Change management reduces operational disruption and risk",
+    "type": "operations",
+    "difficulty": "medium",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["operational disruption", "risk"],
+      "must_avoid": ["unnecessary process"]
+    }
+  },
+  {
+    "input": "What is an SLA?",
+    "expected_output": "An SLA defines service expectations between providers and customers",
+    "type": "governance",
+    "difficulty": "easy",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["service expectations"],
+      "must_avoid": ["marketing document"]
+    }
+  },
+  {
+    "input": "How can enterprises ensure data privacy compliance?",
+    "expected_output": "By implementing strong data governance and security controls",
+    "type": "compliance",
+    "difficulty": "medium",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["data governance", "security controls"],
+      "must_avoid": ["ignore regulations"]
+    }
+  },
+  {
+    "input": "What is the role of ITIL in enterprise operations?",
+    "expected_output": "ITIL provides best practices for IT service management",
+    "type": "operations",
+    "difficulty": "medium",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["best practices", "IT service management"],
+      "must_avoid": ["outdated framework"]
+    }
+  },
+  {
+    "input": "How can enterprises mitigate supply chain risks?",
+    "expected_output": "By diversifying suppliers and implementing risk assessments",
+    "type": "risk management",
+    "difficulty": "medium",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["diversifying suppliers", "risk assessments"],
+      "must_avoid": ["rely on single supplier"]
+    }
+  },
+  {
+    "input": "What is the purpose of a business continuity plan?",
+    "expected_output": "To ensure critical business functions can continue during disruptions",
+    "type": "operations",
+    "difficulty": "medium",
+    "domain": "enterprise_ops",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["critical business functions", "disruptions"],
+      "must_avoid": ["optional document"]
+    }
+}
+]
