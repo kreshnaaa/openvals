@@ -1,0 +1,123 @@
+[
+  {
+    "input": "What is 15% of 200?",
+    "expected_output": "30",
+    "type": "arithmetic",
+    "difficulty": "easy",
+    "domain": "math",
+    "evaluation": {
+      "strict": true,
+      "keywords": ["30"],
+      "must_avoid": []
+    }
+  },
+  {
+    "input": "Solve: 2x + 6 = 14",
+    "expected_output": "x = 4",
+    "type": "algebra",
+    "difficulty": "easy",
+    "domain": "math",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["4"],
+      "must_avoid": ["5"]
+    }
+  },
+    {
+        "input": "What is the derivative of f(x) = 3x^2 + 2x + 1?",
+        "expected_output": "f'(x) = 6x + 2",
+        "type": "calculus",
+        "difficulty": "medium",
+        "domain": "math",
+        "evaluation": {
+        "strict": false,
+        "keywords": ["6x", "+", "2"],
+        "must_avoid": ["6x^2", "+", "2x"]
+        }
+    },
+    {
+        "input": "Calculate the area of a circle with radius 5",
+        "expected_output": "Area = 25π",
+        "type": "geometry",
+        "difficulty": "medium",
+        "domain": "math",
+        "evaluation": {
+        "strict": false,
+        "keywords": ["25π"],
+        "must_avoid": ["10π"]
+        }
+    },
+    {
+        "input": "What is the value of log10(1000)?",
+        "expected_output": "3",
+        "type": "logarithms",
+        "difficulty": "easy",
+        "domain": "math",
+        "evaluation": {
+        "strict": true,
+        "keywords": ["3"],
+        "must_avoid": []
+        }
+    },
+    {
+    "input": "If f(x) = 2x + 3, what is f(5)?",
+    "expected_output": "f(5) = 13",
+    "type": "functions",
+    "difficulty": "easy",
+    "domain": "math",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["13"],
+      "must_avoid": ["10"]
+    }
+  },
+  {
+    "input": "Is 7 a prime number?",
+    "expected_output": "Yes, 7 is a prime number",
+    "type": "number theory",
+    "difficulty": "easy",
+    "domain": "math",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["prime number"],
+      "must_avoid": ["composite"]
+    }
+  },
+  {
+    "input": "What is the greatest common divisor of 48 and 18?",
+    "expected_output": "6",
+    "type": "number theory",
+    "difficulty": "medium",
+    "domain": "math",
+    "evaluation": {
+      "strict": true,
+      "keywords": ["6"],
+      "must_avoid": ["12"]
+    }
+  },
+  {
+    "input": "Calculate the limit: lim(x→0) (sin(x)/x)",
+    "expected_output": "1",
+    "type": "calculus",
+    "difficulty": "medium",
+    "domain": "math",
+    "evaluation": {
+      "strict": true,
+      "keywords": ["1"],
+      "must_avoid": ["0"]
+    }
+  },
+  {
+    "input": "What is the sum of the first 10 natural numbers?",
+    "expected_output": "55",
+    "type": "arithmetic",
+    "difficulty": "medium",
+    "domain": "math",
+    "evaluation": {
+      "strict": true,
+      "keywords": ["55"],
+      "must_avoid": ["50"]
+    }
+  }
+    
+]

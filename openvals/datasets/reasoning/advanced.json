@@ -22,5 +22,101 @@
       "keywords": ["general premises", "conclusions"],
       "must_avoid": ["random guessing"]
     }
-  }
+  },
+  {
+    "input": "If a statement is true, does it mean its converse is also true?",
+    "expected_output": "No, the truth of a statement does not guarantee the truth of its converse",
+    "type": "logic",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["does not guarantee"],
+      "must_avoid": ["yes always"]
+    }
+  },
+  {
+    "input": "What is the difference between inductive and deductive reasoning?",
+    "expected_output": "Inductive reasoning generalizes from specific cases, while deductive reasoning derives specific conclusions from general premises",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["generalizes", "derives specific conclusions"],
+      "must_avoid": []
+    }
+  },
+  {
+    "input": "Can a valid argument have a false conclusion?",
+    "expected_output": "Yes, an argument can be valid even if its conclusion is false, as long as the logical structure is correct",
+    "type": "logic",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["valid", "logical structure"],
+      "must_avoid": ["no valid arguments can have false conclusions"]
+    }
+  },
+  {
+    "input": "What is a logical fallacy?",
+    "expected_output": "A logical fallacy is an error in reasoning that undermines the validity of an argument",
+    "type": "reasoning",
+    "difficulty": "easy",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["error in reasoning", "undermines validity"],
+      "must_avoid": ["a logical fallacy is just a weak argument"]
+    }
+  },
+  {
+    "input": "If all cats are animals and some animals are pets, can we conclude all cats are pets?",
+    "expected_output": "No, the conclusion is not logically guaranteed",
+    "type": "logic",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["not logically guaranteed"],
+      "must_avoid": ["yes definitely"]
+    }
+  },
+  {
+    "input": "What is the principle of charity in reasoning?",
+    "expected_output": "The principle of charity involves interpreting others' arguments in the most rational way possible",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["interpreting", "most rational way"],
+      "must_avoid": ["always assuming others are wrong"]
+    }
+  },
+  {
+    "input": "Can a sound argument have a false conclusion?",
+    "expected_output": "No, a sound argument must have a true conclusion",
+    "type": "logic",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["sound argument", "true conclusion"],
+      "must_avoid": ["yes, a sound argument can have a false conclusion"]
+    }
+  },
+  {
+    "input": "What is the difference between a necessary and sufficient condition?",
+    "expected_output": "A necessary condition must be met for an event to occur, while a sufficient condition guarantees the event occurs",
+    "type": "reasoning",
+    "difficulty": "medium",
+    "domain": "reasoning",
+    "evaluation": {
+      "strict": false,
+      "keywords": ["necessary condition", "sufficient condition"],
+      "must_avoid": []
+    }
+}
 ]

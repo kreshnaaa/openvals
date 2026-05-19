@@ -1,0 +1,21 @@
+{
+  "name": "Math Advanced",
+  "domain": "math",
+  "version": "1.0",
+  "description": "Mathematics and numerical reasoning benchmark",
+  "difficulty": "medium",
+
+  "recommended_metrics": [
+    "accuracy",
+    "semantic",
+    "consistency"
+  ],
+
+  "recommended_weights": {
+    "accuracy": 0.50,
+    "semantic": 0.20,
+    "consistency": 0.30
+  },
+
+  "dataset_file": "advanced.json"
+}
