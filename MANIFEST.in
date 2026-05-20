@@ -1,1 +1,6 @@
+include README.md
+include LICENSE
+
 recursive-include openvals/datasets *.json
+recursive-include openvals/reporting/templates *.html
+recursive-include docs/screenshots *.png

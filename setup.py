@@ -2,7 +2,16 @@ from setuptools import setup, find_packages
 
 setup(
     name="openvals",
-    version="0.1.5",
+    version="0.2.0",
+    author="Vishwanath Akuthota",
+    description=(
+
+        "Enterprise AI Evaluation & Trust Framework "
+
+        "for benchmarking, validating, and trusting LLMs"
+
+    ),
+    url="https://github.com/vishwanathakuthota/openvals",
     packages=find_packages(),
     include_package_data=True,
 
@@ -11,7 +20,14 @@ setup(
         "pandas",
         "scikit-learn",
         "typer",
-        "rich"
+        "rich",
+        "matplotlib",
+        "seaborn",
+        "jupyterlab",
+        "notebook",
+        "plotly",
+        "sentence-transformers"
+
     ],
 
     entry_points={
