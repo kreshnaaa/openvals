@@ -18,5 +18,22 @@ dist/
 # macOS
 .DS_Store
 *.html
+
+# Outputs
+outputs/
 reports/
+pdf/
 output/
+
+# IDE 
+.vscode/
+.idea/
+
+# Testing
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.log
+.pytest_cache/
