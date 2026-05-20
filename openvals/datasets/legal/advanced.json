@@ -35,7 +35,6 @@
       "must_avoid": []
     }
   },
-  [
   {
     "input": "What is a breach of contract?",
     "expected_output": "A breach of contract occurs when a party fails to fulfill contractual obligations",
@@ -121,4 +120,3 @@
     }
   }
   ]
-]

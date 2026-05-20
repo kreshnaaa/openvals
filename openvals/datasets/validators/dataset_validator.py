@@ -2,7 +2,7 @@ import json
 
 
 REQUIRED_FIELDS = [
-    "prompt",
+    "input",
     "expected_output"
 ]
 
@@ -15,19 +15,7 @@ def validate_dataset(dataset_path):
 
     with open(dataset_path, "r", encoding="utf-8") as f:
 
-        data = json.load(f)
-
-    # ==========================================
-    # VALIDATE SAMPLES EXIST
-    # ==========================================
-
-    if "samples" not in data:
-
-        raise ValueError(
-            "Dataset missing samples section"
-        )
-
-    dataset = data["samples"]
+        dataset = json.load(f)
 
     # ==========================================
     # VALIDATE TYPE
@@ -36,7 +24,7 @@ def validate_dataset(dataset_path):
     if not isinstance(dataset, list):
 
         raise ValueError(
-            "Samples must be a list"
+            "Dataset must be a list"
         )
 
     # ==========================================
@@ -50,7 +38,7 @@ def validate_dataset(dataset_path):
         )
 
     # ==========================================
-    # VALIDATE EACH SAMPLE
+    # VALIDATE SAMPLES
     # ==========================================
 
     for index, sample in enumerate(dataset):

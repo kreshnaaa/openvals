@@ -1,8 +1,10 @@
 # OpenVals
 
+> Enterprise AI Evaluation & Trust Framework
+
 OpenVals is an the evaluation + trust infrastructure for LLMs, SLMs, local AI, private AI, and public AI designed to help organizations measure, compare, and trust AI models before deployment.
 
-    > Evaluate. Benchmark. Trust. Deploy AI/ML with Confidence.
+> Evaluate. Benchmark. Trust. Deploy AI/ML with Confidence.
 
 ![Python](https://img.shields.io/pypi/pyversions/openvals)
 ![Repo Size](https://img.shields.io/github/repo-size/vishwanathakuthota/openvals)
@@ -100,9 +102,12 @@ Trust Score = Σ (wᵢ × mᵢ)
 - Scalable evaluation pipelines
 
 ### 5. Recommendation Engine
-- Suggests best model for your dataset
-- Tradeoff-aware ranking (speed vs accuracy vs safety)
-- Use-case based model selection (coming next version)
+OpenVals includes an AI recommendation engine capable of:
+- identifying optimal models
+- evaluating deployment readiness
+- analyzing tradeoffs
+- surfacing operational risks
+- generating trust recommendations
 
 ### 6. Semantic Intelligence Engine
 
@@ -124,6 +129,16 @@ Future roadmap includes:
 - BGE embeddings
 - InstructorXL
 - Enterprise/private embedding systems
+
+## Supported Benchmark Domains
+
+- Finance
+- Cybersecurity
+- Legal
+- Math
+- Reasoning
+- Enterprise Operations
+- Software Development
 
 ---
 ## Installation
@@ -180,13 +195,12 @@ print(results)
 ```
 ---
 ## 📊 Example Output
-```code
+```text
 === FINAL RANKING ===
 1. mistral   (0.91)
 2. llama3    (0.87)
 3. llama2    (0.84)
 ```
-## Key Features
 
 ## Key Features
 
@@ -198,6 +212,7 @@ print(results)
 * 🔐 Reliability + safety scoring
 * 📈 Normalized comparison engine
 * 🎯 AI-powered recommendation engine
+* Visual analytics dashboard
 
 ## Built For
 
@@ -213,17 +228,18 @@ print(results)
 
 This project uses the following key performance indicators to evaluate system output and efficiency.
 
-### Core Metrics
+### Evaluation Metrics
 
-| Metric | Meaning |
-| :--- | :--- |
-| **Accuracy** | Exact / relaxed match scoring |
-| **Semantic** | Embedding-powered meaning similarity |
-| **Latency** | Response speed |
-| **Reliability** | Stability of output |
-| **Safety** | Risk/unsafe content detection |
-| **Consistency** | Stability across repeated evaluations |
-| **Variance** | Output fluctuation measurement |
+| Metric | Description |
+|---|---|
+| Accuracy | Correctness of output |
+| Semantic | Contextual meaning similarity |
+| Reliability | Stability across evaluations |
+| Safety | Risk and unsafe output analysis |
+| Consistency | Repeatability of model behavior |
+| Variance | Output fluctuation measurement |
+| Latency | Response generation speed |
+| DRS Score | Overall deployment reliability |
 
 ### Usage
 These metrics are applied during the evaluation phase to ensure consistent and high-quality results across all modules.
@@ -280,30 +296,18 @@ openvals/
 ---
 ## 🚀 Roadmap
 
-### v0.1.5 (Current)
-- Core evaluator
-- Multi-model benchmarking
-- DRS scoring
-- Recommendation engine
-- HTML reporting
-- Configurable benchmarking profiles
-- Ollama integration
-- CLI workflows
-
-### v0.2.0(in progress)
-- Advanced normalization
-- Dataset expansion tools
-- Embedding-powered semantic scoring
-- Reliability scoring redesign
-- Safety scoring redesign
-
 ### v0.3.0
-- Explainability layer (SHAP/LIME)
+- Hallucination Probability Index
+- AI Risk Scoring
+- Governance Analytics
+- Certification System
+- PDF Reporting
+- Adversarial Testing
 - REST APIs
 - Evaluation history
 - External dataset integrations
 
-### v1.0.0
+### Future
 - SaaS platform
 - Enterprise governance
 - Continuous AI validation
@@ -344,10 +348,13 @@ Developed as part of DrPinnacle’s AI Trust & Validation Initiative, focused on
 * [OpenValidations](https://openvalidations.com)
 
 ---
-## ⚡ Final Thought
+## Final Thought
+
 AI models are easy to build.
-Trusting them is the hard part.
-OpenVals exists to solve that.
+
+Trustworthy AI systems are difficult to engineer.
+
+OpenVals exists to help organizations measure, validate, and trust AI before deployment.
 
 ## 🔍 Keywords
 
