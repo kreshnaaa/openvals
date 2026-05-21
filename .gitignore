@@ -8,7 +8,6 @@ __pycache__/
 *.pyo
 *.pyd
 *$py.class
-*.py
 
 # Build artifacts
 build/
