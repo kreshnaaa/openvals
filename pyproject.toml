@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvals"
-version = "0.2.0"
+version = "0.2.1"
 
 description = "Open source AI evaluation, validation, benchmarking, recommendation engine and trust layer for LLMs"
 
@@ -12,7 +12,7 @@ readme = "README.md"
 
 requires-python = ">=3.8"
 
-license = { text = "MIT" }
+license = { text = "DrPinnacle" }
 
 authors = [
     { name = "Vishwanath Akuthota" }

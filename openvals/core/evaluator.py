@@ -1,10 +1,10 @@
-from openvals.metrics.accuracy import accuracy
-from openvals.metrics.semantic import semantic_similarity
-from openvals.metrics.latency import measure_latency
-from openvals.metrics.reliability import reliability_score
-from openvals.metrics.safety import safety
-from openvals.metrics.consistency import consistency
-from openvals.metrics.variance import variance
+from openvals.metrics.performance.accuracy import accuracy
+from openvals.metrics.performance.semantic import semantic_similarity
+from openvals.metrics.performance.latency import measure_latency
+from openvals.metrics.trust.reliability import reliability_score
+from openvals.metrics.trust.safety import safety
+from openvals.metrics.trust.consistency import consistency
+from openvals.metrics.trust.variance import variance
 
 from openvals.scoring.weighted import weighted_score
 from openvals.scoring.drs import compute_drs
