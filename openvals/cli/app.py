@@ -1,6 +1,6 @@
 import typer
 from pathlib import Path
-
+from openvals import __version__
 from openvals.datasets.loader import load_builtin_dataset
 from openvals.datasets.metadata import load_dataset_metadata
 from openvals.datasets.registry import DATASETS
@@ -36,7 +36,7 @@ def version():
     """
 
     typer.echo(
-        "OpenVals v0.2.0 built by DrPinnacle "
+        f"OpenVals v{__version__} built by DrPinnacle "
         "(https://drpinnacle.com) "
         "Vishwanath Akuthota"
     )
@@ -79,7 +79,7 @@ def benchmark(
     Run OpenVals benchmark.
     """
 
-    typer.echo("\n🚀 OpenVals Benchmark Starting...\n")
+    typer.echo(f"\n🚀 OpenVals - AI Trust Platform Starting... (v{__version__})\n")
 
 
     # =====================================================

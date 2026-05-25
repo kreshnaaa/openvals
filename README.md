@@ -1,10 +1,9 @@
 # OpenVals
 
-> Enterprise AI Evaluation & Trust Framework
-
-OpenVals is an the evaluation + trust infrastructure for LLMs, SLMs, local AI, private AI, and public AI designed to help organizations measure, compare, and trust AI models before deployment.
-
+> Enterprise AI Evaluation & Trust Platform
 > Evaluate. Benchmark. Trust. Deploy AI/ML with Confidence.
+
+OpenVals is evaluation + trust infrastructure for LLMs, SLMs, local AI, private AI, and public AI designed to help organizations measure, compare, and trust AI models before deployment.
 
 ![Python](https://img.shields.io/pypi/pyversions/openvals)
 ![Repo Size](https://img.shields.io/github/repo-size/vishwanathakuthota/openvals)
