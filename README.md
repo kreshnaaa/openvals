@@ -138,6 +138,7 @@ Future roadmap includes:
 - Reasoning
 - Enterprise Operations
 - Software Development
+- Developer dataset
 
 ---
 ## Installation
@@ -209,19 +210,6 @@ print(results)
 
 This project uses the following key performance indicators to evaluate system output and efficiency.
 
-### Evaluation Metrics
-
-| Metric | Description |
-|---|---|
-| Accuracy | Correctness of output |
-| Semantic | Contextual meaning similarity |
-| Reliability | Stability across evaluations |
-| Safety | Risk and unsafe output analysis |
-| Consistency | Repeatability of model behavior |
-| Variance | Output fluctuation measurement |
-| Latency | Response generation speed |
-| DRS Score | Overall deployment reliability |
-
 ### Usage
 These metrics are applied during the evaluation phase to ensure consistent and high-quality results across all modules.
 
@@ -239,41 +227,6 @@ These metrics are applied during the evaluation phase to ensure consistent and h
 | DRS Score | Higher ↑ | 0.75 → 1.00 | Overall deployment reliability |
 
 > Scores closer to ideal ranges indicate stronger production readiness and deployment trustworthiness.
-
----
-# API Usage
-
-```python
-from openvals.core.evaluator import Evaluator
-from openvals.models.dummy_model import DummyModel
-from openvals.datasets.loader import load_dataset
-
-dataset = load_dataset("examples/sample_eval.json")
-model = DummyModel()
-
-evaluator = Evaluator(model, dataset)
-result = evaluator.run()
-
-print(result)
-```
----
-## 🏗️ Project Structure
-```tree
-openvals/
-│
-├── core/              # Evaluation engine
-├── cli/               # Typer CLI
-├── config/            # Config presets & loaders
-├── models/            # Model adapters
-├── datasets/          # Dataset loading & schema
-├── metrics/           # Evaluation metrics
-├── benchmarking/      # Multi-model benchmarking layer
-├── scoring/           # Scoring logic
-├── safety/            # Risk & safety checks (WIP)
-├── reporting/         # Output & reports (WIP)
-├── cli.py             # Command-line interface
-```
-
 ---
 ## 🚀 Roadmap
 

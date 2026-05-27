@@ -23,12 +23,17 @@ def classify_trust(drs):
     else:
         return "🔴 Unsafe / Unstable"
 
-
 # =========================================================
 # METRIC STATUS
 # =========================================================
 
-def metric_status(value, high=0.8, medium=0.6):
+def metric_status(
+
+    value,
+    high=0.8,
+    medium=0.6
+
+):
 
     if value >= high:
         return "🟢"
@@ -38,16 +43,32 @@ def metric_status(value, high=0.8, medium=0.6):
 
     return "🔴"
 
+# =========================================================
+# HALLUCINATION STATUS
+# LOWER IS BETTER
+# =========================================================
+
+def hallucination_status(value):
+
+    if value <= 0.20:
+        return "🟢"
+
+    elif value <= 0.50:
+        return "🟡"
+
+    return "🔴"
 
 # =========================================================
 # GENERATE HTML REPORT
 # =========================================================
 
 def generate_html_report(
+
     results,
     recommendation,
     output_file="report.html",
     charts_dir="charts"
+
 ):
 
     # =====================================================
@@ -55,9 +76,12 @@ def generate_html_report(
     # =====================================================
 
     if recommendation is None:
+
         recommendation = {}
 
-    deployment = recommendation.get("deployment") or {}
+    deployment = recommendation.get(
+        "deployment"
+    ) or {}
 
     deployment.setdefault(
         "readiness",
@@ -83,45 +107,68 @@ def generate_html_report(
     )
 
     if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
+
+        os.makedirs(
+            output_dir,
+            exist_ok=True
+        )
 
     charts_path = os.path.join(
         output_dir,
         charts_dir
     )
 
-    os.makedirs(charts_path, exist_ok=True)
+    os.makedirs(
+        charts_path,
+        exist_ok=True
+    )
 
     # =====================================================
     # GENERATE CHARTS
     # =====================================================
 
     chart_files = generate_all_charts(
+
         results,
         charts_path
+
     )
 
     # =====================================================
     # RELATIVE IMAGE PATHS
     # =====================================================
 
-    radar_chart = f"{charts_dir}/radar_chart.png"
+    radar_chart = (
+        f"{charts_dir}/radar_chart.png"
+    )
 
-    latency_chart = f"{charts_dir}/latency_chart.png"
+    latency_chart = (
+        f"{charts_dir}/latency_chart.png"
+    )
 
-    drs_chart = f"{charts_dir}/drs_chart.png"
+    drs_chart = (
+        f"{charts_dir}/drs_chart.png"
+    )
+
+    hallucination_chart = (
+        f"{charts_dir}/hallucination_chart.png"
+    )
 
     # =====================================================
     # SORT MODELS
     # =====================================================
 
     ranked = sorted(
+
         results.items(),
+
         key=lambda x: x[1].get(
             "drs_score",
             0
         ),
+
         reverse=True
+
     )
 
     # =====================================================
@@ -131,13 +178,24 @@ def generate_html_report(
     rows = ""
 
     for i, (model, data) in enumerate(
+
         ranked,
         1
+
     ):
 
-        m = data.get("metrics", {})
+        m = data.get(
+            "metrics",
+            {}
+        )
+
+        hallucination = m.get(
+            "hallucination",
+            0
+        )
 
         rows += f"""
+
         <tr>
 
             <td>{i}</td>
@@ -177,6 +235,11 @@ def generate_html_report(
             </td>
 
             <td>
+                {hallucination_status(hallucination)}
+                {hallucination:.3f}
+            </td>
+
+            <td>
                 {m.get('latency', 0):.2f}
             </td>
 
@@ -187,6 +250,7 @@ def generate_html_report(
             </td>
 
         </tr>
+
         """
 
     # =====================================================
@@ -194,13 +258,18 @@ def generate_html_report(
     # =====================================================
 
     risks_html = "".join(
+
         [
+
             f"<li>{r}</li>"
+
             for r in recommendation.get(
                 "risks",
                 []
             )
+
         ]
+
     )
 
     # =====================================================
@@ -208,13 +277,18 @@ def generate_html_report(
     # =====================================================
 
     insights_html = "".join(
+
         [
+
             f"<li>{i}</li>"
+
             for i in recommendation.get(
                 "insights",
                 []
             )
+
         ]
+
     )
 
     # =====================================================
@@ -222,13 +296,18 @@ def generate_html_report(
     # =====================================================
 
     tradeoffs_detail_html = "".join(
+
         [
+
             f"<li>{t}</li>"
+
             for t in recommendation.get(
                 "tradeoffs_detail",
                 []
             )
+
         ]
+
     )
 
     # =====================================================
@@ -236,13 +315,18 @@ def generate_html_report(
     # =====================================================
 
     anomalies_html = "".join(
+
         [
+
             f"<li>{a}</li>"
+
             for a in recommendation.get(
                 "anomalies",
                 []
             )
+
         ]
+
     )
 
     # =====================================================
@@ -250,13 +334,18 @@ def generate_html_report(
     # =====================================================
 
     deployment_html = "".join(
+
         [
+
             f"<li>{d}</li>"
+
             for d in deployment.get(
                 "recommendations",
                 []
             )
+
         ]
+
     )
 
     # =====================================================
@@ -264,7 +353,12 @@ def generate_html_report(
     # =====================================================
 
     trust = classify_trust(
-        recommendation.get("drs", 0)
+
+        recommendation.get(
+            "drs",
+            0
+        )
+
     )
 
     # =====================================================
@@ -272,20 +366,34 @@ def generate_html_report(
     # =====================================================
 
     summary = recommendation.get(
+
         "summary",
+
         f"""
+
         OpenVals recommends
+
         <b>
-            {recommendation.get(
-                'recommended_model',
-                'Unknown'
-            )}
+
+            {
+
+                recommendation.get(
+                    'recommended_model',
+                    'Unknown'
+                )
+
+            }
+
         </b>
+
         based on DRS performance,
         semantic capability,
         operational reliability,
+        hallucination probability,
         and deployment confidence.
+
         """
+
     )
 
     # =====================================================
@@ -301,6 +409,7 @@ def generate_html_report(
     # =====================================================
 
     html = f"""
+
     <html>
 
     <head>
@@ -312,11 +421,13 @@ def generate_html_report(
         <style>
 
             body {{
+
                 font-family: Arial, sans-serif;
                 background: #f4f7fb;
                 margin: 0;
                 padding: 30px;
                 color: #222;
+
             }}
 
             h1 {{
@@ -334,85 +445,116 @@ def generate_html_report(
             }}
 
             .subtitle {{
+
                 color: #666;
                 margin-bottom: 30px;
+
             }}
 
             .card {{
+
                 background: white;
                 padding: 24px;
                 margin-bottom: 25px;
                 border-radius: 14px;
+
                 box-shadow:
                     0 4px 12px rgba(0,0,0,0.08);
+
                 border-left:
                     6px solid #4f46e5;
+
             }}
 
             .warning {{
+
                 border-left:
                     6px solid #ef4444;
+
             }}
 
             .success {{
+
                 border-left:
                     6px solid #16a34a;
+
             }}
 
             .info {{
+
                 border-left:
                     6px solid #0284c7;
+
             }}
 
             .highlight {{
+
                 color: #0b7a32;
                 font-weight: bold;
+
             }}
 
             .trust {{
+
                 font-size: 20px;
                 font-weight: bold;
                 margin-top: 10px;
+
             }}
 
             .deployment {{
+
                 font-size: 18px;
                 font-weight: bold;
                 margin-bottom: 10px;
                 color: #2563eb;
+
             }}
 
             table {{
+
                 width: 100%;
                 border-collapse: collapse;
                 margin-top: 15px;
+
             }}
 
             th {{
+
                 background: #111827;
                 color: white;
                 padding: 14px;
                 text-align: center;
+
             }}
 
             td {{
+
                 padding: 12px;
+
                 border-bottom:
                     1px solid #e5e7eb;
+
                 text-align: center;
                 background: white;
+
             }}
 
             tr:hover td {{
+
                 background: #f9fafb;
+
             }}
 
             ul {{
+
                 margin-top: 8px;
                 line-height: 1.7;
+
             }}
 
             .metric-box {{
+
                 display: inline-block;
                 margin-right: 20px;
                 margin-top: 10px;
@@ -421,29 +563,39 @@ def generate_html_report(
                 background: #f9fafb;
                 border-radius: 10px;
                 text-align: center;
+
             }}
 
             .chart {{
+
                 width: 100%;
                 max-width: 850px;
                 margin-top: 20px;
                 border-radius: 10px;
+
                 border:
                     1px solid #e5e7eb;
+
             }}
 
             .footer {{
+
                 text-align: center;
                 margin-top: 40px;
                 color: #777;
                 font-size: 14px;
+
             }}
 
             hr {{
+
                 border: none;
+
                 border-top:
                     1px solid #e5e7eb;
+
                 margin: 20px 0;
+
             }}
 
         </style>
@@ -473,8 +625,10 @@ def generate_html_report(
             </p>
 
             <div class="trust">
+
                 Trust Classification:
                 {trust}
+
             </div>
 
         </div>
@@ -494,12 +648,16 @@ def generate_html_report(
                 </b>
 
                 <span class="highlight">
+
                     {
+
                         recommendation.get(
                             'recommended_model',
                             'Unknown'
                         )
+
                     }
+
                 </span>
 
             </p>
@@ -509,10 +667,12 @@ def generate_html_report(
                 <b>Score</b><br>
 
                 {
+
                     recommendation.get(
                         'score',
                         0
                     )
+
                 }
 
             </div>
@@ -522,10 +682,12 @@ def generate_html_report(
                 <b>DRS</b><br>
 
                 {
+
                     recommendation.get(
                         'drs',
                         0
                     )
+
                 }
 
             </div>
@@ -535,10 +697,12 @@ def generate_html_report(
                 <b>Confidence</b><br>
 
                 {
+
                     recommendation.get(
                         'confidence',
                         0
                     )
+
                 }
 
             </div>
@@ -552,10 +716,12 @@ def generate_html_report(
                 </b><br>
 
                 {
+
                     recommendation.get(
                         'reason',
                         'No reason provided'
                     )
+
                 }
 
             </p>
@@ -567,10 +733,12 @@ def generate_html_report(
                 </b><br>
 
                 {
+
                     recommendation.get(
                         'tradeoffs',
                         'None'
                     )
+
                 }
 
             </p>
@@ -619,6 +787,18 @@ def generate_html_report(
                 alt="DRS Chart"
             >
 
+            <hr>
+
+            <h3>
+                Hallucination Risk Comparison
+            </h3>
+
+            <img
+                src="{hallucination_chart}"
+                class="chart"
+                alt="Hallucination Chart"
+            >
+
         </div>
 
         <!-- DEPLOYMENT -->
@@ -630,12 +810,16 @@ def generate_html_report(
             </h2>
 
             <div class="deployment">
+
                 {
+
                     deployment.get(
                         "readiness",
                         "Unknown"
                     )
+
                 }
+
             </div>
 
             <ul>
@@ -720,6 +904,7 @@ def generate_html_report(
                     <th>Safety</th>
                     <th>Consistency</th>
                     <th>Variance</th>
+                    <th>Hallucination</th>
                     <th>Latency(ms)</th>
                     <th>DRS</th>
 
@@ -747,6 +932,7 @@ def generate_html_report(
     </body>
 
     </html>
+
     """
 
     # =====================================================
@@ -754,14 +940,18 @@ def generate_html_report(
     # =====================================================
 
     with open(
+
         output_file,
         "w",
         encoding="utf-8"
+
     ) as f:
 
         f.write(html)
 
     print(
+
         f"✅ HTML report generated: "
         f"{output_file}"
+
     )

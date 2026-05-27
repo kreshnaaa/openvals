@@ -1,49 +1,78 @@
 import typer
 from pathlib import Path
+
 from openvals import __version__
-from openvals.datasets.loader import load_builtin_dataset
-from openvals.datasets.metadata import load_dataset_metadata
-from openvals.datasets.registry import DATASETS
 
-from openvals.config.loader import load_config
+from openvals.datasets.loader import (
+    load_builtin_dataset
+)
 
-from openvals.models.ollama_model import OllamaModel
+from openvals.datasets.metadata import (
+    load_dataset_metadata
+)
 
-from openvals.benchmarking.benchmark import BenchmarkRunner
+from openvals.datasets.registry import (
+    DATASETS
+)
 
-from openvals.recommendation.engine import RecommendationEngine
+from openvals.config.loader import (
+    load_config
+)
 
-from openvals.reporting.html_report import generate_html_report
+from openvals.models.ollama_model import (
+    OllamaModel
+)
+
+from openvals.benchmarking.benchmark import (
+    BenchmarkRunner
+)
+
+from openvals.recommendation.engine import (
+    RecommendationEngine
+)
+
+from openvals.reporting.html_report import (
+    generate_html_report
+)
 
 from openvals.utils.paths import (
     create_output_structure
 )
 
+# =========================================================
+# TYPER APP
+# =========================================================
 
 app = typer.Typer(
-    help="OpenVals - AI Evaluation & Benchmarking Framework"
+
+    help=
+    "OpenVals - AI Evaluation & "
+    "Trust Intelligence Framework"
+
 )
 
-
 # =========================================================
-# VERSION COMMAND
+# VERSION
 # =========================================================
 
 @app.command()
 def version():
+
     """
     Show OpenVals version.
     """
 
     typer.echo(
-        f"OpenVals v{__version__} built by DrPinnacle "
-        "(https://drpinnacle.com) "
-        "Vishwanath Akuthota"
+
+        f"OpenVals v{__version__} "
+        f"built by DrPinnacle "
+        f"(https://drpinnacle.com) "
+        f"Vishwanath Akuthota"
+
     )
 
-
 # =========================================================
-# BENCHMARK COMMAND
+# BENCHMARK
 # =========================================================
 
 @app.command("benchmark")
@@ -75,12 +104,17 @@ def benchmark(
     )
 
 ):
+
     """
     Run OpenVals benchmark.
     """
 
-    typer.echo(f"\n🚀 OpenVals - AI Trust Platform Starting... (v{__version__})\n")
+    typer.echo(
 
+        f"\n🚀 OpenVals AI Trust Platform "
+        f"Starting... (v{__version__})\n"
+
+    )
 
     # =====================================================
     # CREATE OUTPUT STRUCTURE
@@ -91,19 +125,25 @@ def benchmark(
     output_path = Path(output)
 
     if not output_path.parent.exists():
+
         output_path.parent.mkdir(
+
             parents=True,
             exist_ok=True
-        )
 
+        )
 
     # =====================================================
     # LOAD DATASET
     # =====================================================
 
-    dataset_data = load_builtin_dataset(dataset)
+    dataset_data = load_builtin_dataset(
+        dataset
+    )
 
-    metadata = load_dataset_metadata(dataset)
+    metadata = load_dataset_metadata(
+        dataset
+    )
 
     if config:
 
@@ -111,27 +151,40 @@ def benchmark(
 
         weights = cfg["weights"]
 
-        typer.echo(f"⚙️ Config Loaded : {config}")
+        typer.echo(
+            f"⚙️ Config Loaded : {config}"
+        )
 
     else:
 
-        weights = metadata["recommended_weights"]
-
+        weights = metadata[
+            "recommended_weights"
+        ]
 
     typer.echo("📦 Dataset Loaded")
 
-    typer.echo(f"Dataset : {metadata['name']}")
-    typer.echo(f"Domain  : {metadata['domain']}")
-    typer.echo(f"Version : {metadata['version']}\n")
+    typer.echo(
+        f"Dataset : {metadata['name']}"
+    )
 
+    typer.echo(
+        f"Domain  : {metadata['domain']}"
+    )
+
+    typer.echo(
+        f"Version : {metadata['version']}\n"
+    )
 
     # =====================================================
     # LOAD MODELS
     # =====================================================
 
     model_names = [
+
         m.strip()
+
         for m in models.split(",")
+
     ]
 
     loaded_models = {}
@@ -140,15 +193,18 @@ def benchmark(
 
         try:
 
-            loaded_models[model_name] = OllamaModel(model_name)
+            loaded_models[
+                model_name
+            ] = OllamaModel(model_name)
 
         except Exception as e:
 
             typer.echo(
+
                 f"❌ Failed to load model "
                 f"{model_name}: {str(e)}"
-            )
 
+            )
 
     if not loaded_models:
 
@@ -158,54 +214,65 @@ def benchmark(
 
         raise typer.Exit()
 
-
     typer.echo(
+
         f"🤖 Models Loaded: "
         f"{', '.join(loaded_models.keys())}\n"
-    )
 
+    )
 
     # =====================================================
     # RUN BENCHMARK
     # =====================================================
 
     runner = BenchmarkRunner(
+
         models=loaded_models,
         dataset=dataset_data,
         weights=weights,
-        debug=False
+        debug=True
+
     )
 
     results = runner.run()
-
 
     # =====================================================
     # DRS RANKING
     # =====================================================
 
     ranking = sorted(
+
         [
+
             (
                 model_name,
-                results[model_name]["drs_score"]
+                results[model_name][
+                    "drs_score"
+                ]
             )
+
             for model_name in results
+
         ],
+
         key=lambda x: x[1],
         reverse=True
-    )
 
+    )
 
     # =====================================================
     # FINAL TABLE
     # =====================================================
 
     typer.echo(
+
         "\n=== MODEL BENCHMARK "
         "(DRS Ranked) ===\n"
+
     )
 
     print(
+
         f"{'Rank':<5} "
         f"{'Model':<15} "
         f"{'Acc':<8} "
@@ -214,20 +281,32 @@ def benchmark(
         f"{'Safe':<8} "
         f"{'Cons':<8} "
         f"{'Var':<8} "
+        f"{'HPI':<8} "
         f"{'Lat(ms)':<12} "
         f"{'DRS':<8}"
+
     )
 
-    print("-" * 105)
+    print("-" * 120)
 
-    for rank, (model_name, drs_score) in enumerate(
+    for rank, (
+
+        model_name,
+        drs_score
+
+    ) in enumerate(
+
         ranking,
         start=1
+
     ):
 
-        metrics = results[model_name]["metrics"]
+        metrics = results[
+            model_name
+        ]["metrics"]
 
         print(
+
             f"{rank:<5} "
             f"{model_name:<15} "
             f"{metrics['accuracy']:<8.3f} "
@@ -236,48 +315,99 @@ def benchmark(
             f"{metrics['safety']:<8.3f} "
             f"{metrics['consistency']:<8.3f} "
             f"{metrics['variance']:<8.3f} "
+            f"{metrics['hallucination']:<8.3f} "
             f"{metrics['latency']:<12.2f} "
             f"{drs_score:<8.3f}"
-        )
 
+        )
 
     # =====================================================
     # RECOMMENDATION ENGINE
     # =====================================================
 
-    engine = RecommendationEngine(results)
+    engine = RecommendationEngine(
+        results
+    )
 
     recommendation = engine.recommend(
         use_case=dataset
     )
 
-
     # =====================================================
     # AI ADVISOR REPORT
     # =====================================================
 
-    typer.echo("\n=== AI ADVISOR REPORT ===\n")
+    typer.echo(
+        "\n=== AI ADVISOR REPORT ===\n"
+    )
 
     typer.echo(
+
         f"✅ Recommended Model : "
         f"{recommendation['recommended_model']}"
+
     )
 
     typer.echo(
+
         f"📊 Score             : "
         f"{recommendation['score']}"
+
     )
 
     typer.echo(
+
         f"🧠 DRS               : "
         f"{recommendation['drs']}"
+
     )
 
     typer.echo(
+
         f"🎯 Confidence        : "
         f"{recommendation['confidence']}"
+
     )
 
+    # =====================================================
+    # HPI ANALYSIS
+    # =====================================================
+
+    recommended_model = recommendation[
+        "recommended_model"
+    ]
+
+    hallucination_score = results[
+        recommended_model
+    ]["metrics"].get(
+        "hallucination",
+        0
+    )
+
+    typer.echo(
+
+        f"🧪 Hallucination Risk: "
+        f"{hallucination_score:.3f}"
+
+    )
+
+    if hallucination_score <= 0.20:
+
+        typer.echo(
+            "🟢 Low hallucination risk"
+        )
+
+    elif hallucination_score <= 0.40:
+
+        typer.echo(
+            "🟡 Moderate hallucination risk"
+        )
+
+    else:
+
+        typer.echo(
+            "🔴 High hallucination risk"
+        )
 
     # =====================================================
     # WHY
@@ -286,9 +416,10 @@ def benchmark(
     typer.echo("\nWhy:")
 
     typer.echo(
-        f"→ {recommendation['reason']}"
-    )
 
+        f"→ {recommendation['reason']}"
+
+    )
 
     # =====================================================
     # TRADEOFFS
@@ -297,9 +428,10 @@ def benchmark(
     typer.echo("\nTrade-offs:")
 
     typer.echo(
-        f"→ {recommendation['tradeoffs']}"
-    )
 
+        f"→ {recommendation['tradeoffs']}"
+
+    )
 
     # =====================================================
     # RISKS
@@ -311,7 +443,6 @@ def benchmark(
 
         typer.echo(f"→ {risk}")
 
-
     # =====================================================
     # INSIGHTS
     # =====================================================
@@ -320,10 +451,13 @@ def benchmark(
 
         typer.echo("\nInsights:")
 
-        for insight in recommendation["insights"]:
+        for insight in recommendation[
+            "insights"
+        ]:
 
-            typer.echo(f"→ {insight}")
-
+            typer.echo(
+                f"→ {insight}"
+            )
 
     # =====================================================
     # GENERATE HTML REPORT
@@ -332,17 +466,24 @@ def benchmark(
     if report:
 
         typer.echo(
-            "\n📄 Generating enterprise HTML report..."
+
+            "\n📄 Generating enterprise "
+            "HTML report..."
+
         )
 
         generate_html_report(
+
             results=results,
+
             recommendation=recommendation,
+
             output_file=str(output_path)
+
         )
 
         typer.echo(
-            f"\n✅ HTML report generated:"
+            "\n✅ HTML report generated:"
         )
 
         typer.echo(
@@ -357,25 +498,30 @@ def benchmark(
             "📁 outputs/charts/"
         )
 
-
 # =========================================================
-# DATASETS COMMAND
+# DATASETS
 # =========================================================
 
 @app.command("datasets")
 def datasets():
+
     """
     List available datasets.
     """
 
     typer.echo(
-        "\n📦 Available OpenVals Datasets\n"
+
+        "\n📦 Available "
+        "OpenVals Datasets\n"
+
     )
 
     print(
+
         f"{'Dataset':<15} "
         f"{'Domain':<15} "
         f"{'Description'}"
+
     )
 
     print("-" * 70)
@@ -383,11 +529,12 @@ def datasets():
     for name, info in DATASETS.items():
 
         print(
+
             f"{name:<15} "
             f"{info['domain']:<15} "
             f"{info['description']}"
-        )
 
+        )
 
 # =========================================================
 # ENTRYPOINT
@@ -395,7 +542,6 @@ def datasets():
 
 def main():
     app()
-
 
 if __name__ == "__main__":
     main()

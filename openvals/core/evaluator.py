@@ -1,96 +1,278 @@
-from openvals.metrics.performance.accuracy import accuracy
-from openvals.metrics.performance.semantic import semantic_similarity
-from openvals.metrics.performance.latency import measure_latency
-from openvals.metrics.trust.reliability import reliability_score
-from openvals.metrics.trust.safety import safety
-from openvals.metrics.trust.consistency import consistency
-from openvals.metrics.trust.variance import variance
+from openvals.core.evaluator_helpers import (
+
+    run_accuracy,
+    run_semantic,
+    run_reliability,
+    run_safety,
+    run_consistency,
+    run_variance,
+    run_hallucination,
+    run_latency
+
+)
 
 from openvals.scoring.weighted import weighted_score
 from openvals.scoring.drs import compute_drs
 
 
 class Evaluator:
-    def __init__(self, model, dataset, weights=None, debug=False):
+
+    def __init__(
+
+        self,
+        model,
+        dataset,
+        weights=None,
+        debug=False
+
+    ):
+
         self.model = model
         self.dataset = dataset
         self.debug = debug
 
         self.weights = weights or {
-            "accuracy": 0.35,
-            "semantic": 0.30,
-            "latency": 0.15,
+
+            "accuracy": 0.25,
+            "semantic": 0.20,
+            "safety": 0.20,
+            "hallucination": 0.15,
             "reliability": 0.10,
-            "safety": 0.10
+            "latency": 0.10
+
         }
 
+    # =====================================================
+    # RUN EVALUATION
+    # =====================================================
+
     def run(self):
+
         results = []
 
         agg = {
+
             "accuracy": 0.0,
             "semantic": 0.0,
             "latency": 0.0,
             "reliability": 0.0,
             "safety": 0.0,
             "consistency": 0.0,
-            "variance": 0.0
+            "variance": 0.0,
+            "hallucination": 0.0
+
         }
 
+        # =================================================
+        # PROCESS DATASET
+        # =================================================
+
         for sample in self.dataset:
-            expected = sample.get("expected_output", "")
-            eval_config = sample.get("evaluation", {})
-            task_type = sample.get("type", "default")
+
+            # =============================================
+            # BACKWARD COMPATIBILITY
+            # =============================================
+
+            prompt = sample.get(
+
+                "prompt",
+                sample.get("input", "")
+
+            )
+
+            expected = sample.get(
+                "expected_output",
+                ""
+            )
+
+            eval_config = sample.get(
+                "evaluation",
+                {}
+            )
+
+            task_type = sample.get(
+                "type",
+                "default"
+            )
 
             try:
-                output, latency = measure_latency(
+
+                # =========================================
+                # GENERATE OUTPUT + LATENCY
+                # =========================================
+
+                output, latency = run_latency(
+
                     self.model.generate,
-                    sample["input"]
+                    prompt
+
                 )
 
                 if output is None:
                     output = ""
 
-                if isinstance(output, str) and output.startswith("ERROR"):
-                    acc = sem = rel = saf = cons = var = 0.0
+                # =========================================
+                # HANDLE MODEL FAILURES
+                # =========================================
 
-                else:
-                    acc = accuracy(output, expected, eval_config)
-                    sem = semantic_similarity(output, expected)
+                if (
 
-                    threshold = eval_config.get("semantic_threshold")
-                    if threshold is not None and sem >= threshold:
-                        sem = 1.0
+                    isinstance(output, str)
 
-                    if task_type == "classification":
-                        sem = acc
-                    elif task_type == "generation":
-                        if len(output.split()) > 120:
-                            sem *= 0.9
+                    and output.startswith("ERROR")
 
-                    rel = reliability_score(self.model, sample["input"])
-                    saf = safety(output)
+                ):
 
-                    # 🔥 NEW METRICS
-                    cons = consistency(self.model, sample["input"])
-                    var = variance([output])  # simple v1
+                    raise Exception(output)
+
+                # =========================================
+                # PERFORMANCE METRICS
+                # =========================================
+
+                acc = run_accuracy(
+
+                    output,
+                    expected,
+                    eval_config
+
+                )
+
+                sem = run_semantic(
+                    output,
+                    expected
+                )
+
+                threshold = eval_config.get(
+                    "semantic_threshold"
+                )
+
+                if (
+
+                    threshold is not None
+
+                    and sem >= threshold
+
+                ):
+
+                    sem = 1.0
+
+                # =========================================
+                # TASK-AWARE LOGIC
+                # =========================================
+
+                if task_type == "classification":
+
+                    sem = acc
+
+                elif task_type == "generation":
+
+                    if len(output.split()) > 120:
+
+                        sem *= 0.9
+
+                # =========================================
+                # TRUST METRICS
+                # =========================================
+
+                rel = run_reliability(
+
+                    self.model,
+                    prompt
+
+                )
+
+                saf = run_safety(output)
+
+                cons = run_consistency(
+
+                    self.model,
+                    prompt
+
+                )
+
+                var = run_variance([output])
+
+                # =========================================
+                # HPI / HALLUCINATION
+                # =========================================
+
+                metrics_snapshot = {
+
+                    "semantic": sem,
+                    "consistency": cons,
+                    "variance": var
+
+                }
+
+                hpi_result = run_hallucination(
+
+                    output,
+                    metrics_snapshot
+
+                )
+
+                hall = hpi_result[
+                    "hpi_score"
+                ]
 
             except Exception as e:
+
                 output = f"ERROR: {str(e)}"
+
                 latency = 0.0
-                acc = sem = rel = saf = cons = var = 0.0
+
+                acc = 0.0
+                sem = 0.0
+                rel = 0.0
+                saf = 0.0
+                cons = 0.0
+                var = 0.0
+                hall = 1.0
+
+                hpi_result = {
+
+                    "hpi_score": 1.0,
+                    "risk_level": "Critical",
+                    "overconfidence_matches": []
+
+                }
+
+            # =============================================
+            # DEBUG LOGGING
+            # =============================================
 
             if self.debug:
+
                 print("\n-----------------------------")
-                print(f"Input: {sample['input']}")
+
+                print(f"Prompt: {prompt}")
+
                 print(f"Output: {output}")
+
                 print(f"Accuracy: {acc:.3f}")
+
                 print(f"Semantic: {sem:.3f}")
+
                 print(f"Latency: {latency:.2f} ms")
+
                 print(f"Reliability: {rel:.3f}")
+
                 print(f"Safety: {saf:.3f}")
+
                 print(f"Consistency: {cons:.3f}")
+
                 print(f"Variance: {var:.3f}")
+
+                print(f"Hallucination: {hall:.3f}")
+
+                print(
+                    f"HPI Risk: "
+                    f"{hpi_result['risk_level']}"
+                )
+
+            # =============================================
+            # AGGREGATION
+            # =============================================
 
             agg["accuracy"] += acc
             agg["semantic"] += sem
@@ -99,32 +281,94 @@ class Evaluator:
             agg["safety"] += saf
             agg["consistency"] += cons
             agg["variance"] += var
+            agg["hallucination"] += hall
+
+            # =============================================
+            # STORE SAMPLE RESULT
+            # =============================================
 
             results.append({
-                "input": sample["input"],
+
+                "prompt": prompt,
+
                 "output": output,
+
                 "expected": expected,
+
                 "accuracy": round(acc, 3),
+
                 "semantic": round(sem, 3),
+
                 "latency": round(latency, 2),
+
                 "reliability": round(rel, 3),
+
                 "safety": round(saf, 3),
+
                 "consistency": round(cons, 3),
-                "variance": round(var, 3)
+
+                "variance": round(var, 3),
+
+                "hallucination": round(hall, 3),
+
+                "hallucination_analysis":
+                    hpi_result
+
             })
+
+        # =================================================
+        # FINAL AGGREGATION
+        # =================================================
 
         n = len(self.dataset) if self.dataset else 1
 
-        avg_metrics = {k: v / n for k, v in agg.items()}
+        avg_metrics = {
 
-        score = weighted_score(avg_metrics, self.weights)
+            k: v / n
 
-        # 🔥 DRS SCORE
-        drs_score = compute_drs(avg_metrics)
+            for k, v in agg.items()
+
+        }
+
+        # =================================================
+        # FINAL SCORING
+        # =================================================
+
+        score = weighted_score(
+
+            avg_metrics,
+            self.weights
+
+        )
+
+        drs_score = compute_drs(
+            avg_metrics
+        )
+
+        # =================================================
+        # RETURN RESULTS
+        # =================================================
 
         return {
-            "overall_score": round(score, 3),
-            "drs_score": round(drs_score, 3),
-            "metrics": {k: round(v, 3) for k, v in avg_metrics.items()},
+
+            "overall_score": round(
+                score,
+                3
+            ),
+
+            "drs_score": round(
+                drs_score,
+                3
+            ),
+
+            "metrics": {
+
+                k: round(v, 3)
+
+                for k, v in avg_metrics.items()
+
+            },
+
             "samples": results
+
         }

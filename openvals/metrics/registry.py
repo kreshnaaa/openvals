@@ -1,3 +1,13 @@
+from openvals.metrics.performance.accuracy import accuracy
+from openvals.metrics.performance.semantic import semantic_similarity
+from openvals.metrics.performance.latency import measure_latency
+
+from openvals.metrics.trust.reliability import reliability_score
+from openvals.metrics.trust.safety import safety
+from openvals.metrics.trust.consistency import consistency
+from openvals.metrics.trust.variance import variance
+from openvals.metrics.trust.hallucination import hallucination_analysis
+
 METRIC_REGISTRY = {
 
     # =====================================================

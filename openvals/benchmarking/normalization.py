@@ -13,20 +13,41 @@ METRICS = [
     "reliability",
     "safety",
     "consistency",
-    "variance"
+    "variance",
+    "hallucination"
 
 ]
 
+# =========================================================
+# INVERSE METRICS
+# LOWER IS BETTER
+# =========================================================
+
+INVERSE_METRICS = [
+
+    "latency",
+    "variance",
+    "hallucination"
+
+]
 
 # =========================================================
 # CLIP
 # =========================================================
 
-def clip(value, min_value=0.0, max_value=1.0):
+def clip(
+
+    value,
+    min_value=0.0,
+    max_value=1.0
+
+):
 
     return max(
+
         min(value, max_value),
         min_value
+
     )
 
 
@@ -56,7 +77,12 @@ def safe_metric(value):
 # PERCENTILE RANK
 # =========================================================
 
-def percentile_rank(value, values):
+def percentile_rank(
+
+    value,
+    values
+
+):
 
     sorted_vals = sorted(values)
 
@@ -66,13 +92,51 @@ def percentile_rank(value, values):
         return 1.0
 
     below = len(
+
         [
             v for v in sorted_vals
             if v <= value
         ]
+
     )
 
-    return (below - 1) / (count - 1)
+    return (
+
+        (below - 1)
+        /
+        (count - 1)
+
+    )
+
+
+# =========================================================
+# LOG TRANSFORM
+# =========================================================
+
+def transform_metric(
+
+    metric,
+    value
+
+):
+
+    # ==============================================
+    # LATENCY
+    # ==============================================
+
+    if metric == "latency":
+
+        return math.log(value + 1)
+
+    # ==============================================
+    # HALLUCINATION
+    # ==============================================
+
+    elif metric == "hallucination":
+
+        return value
+
+    return value
 
 
 # =========================================================
@@ -95,15 +159,17 @@ def normalize_scores(
     - hybrid
     """
 
-    values = {
-        metric: []
-        for metric in METRICS
-    }
-
-
     # =====================================================
     # COLLECT METRICS
     # =====================================================
+
+    values = {
+
+        metric: []
+
+        for metric in METRICS
+
+    }
 
     for model_name in results:
 
@@ -112,29 +178,46 @@ def normalize_scores(
         for metric in METRICS:
 
             value = safe_metric(
+
                 metrics.get(metric, 0.0)
+
+            )
+
+            value = transform_metric(
+                metric,
+                value
             )
 
             values[metric].append(value)
-
 
     # =====================================================
     # COMPUTE STATS
     # =====================================================
 
     min_vals = {
+
         metric: min(values[metric])
+
         for metric in METRICS
+
     }
 
     max_vals = {
+
         metric: max(values[metric])
+
         for metric in METRICS
+
     }
 
     means = {
-        metric: statistics.mean(values[metric])
+
+        metric: statistics.mean(
+            values[metric]
+        )
+
         for metric in METRICS
+
     }
 
     stds = {}
@@ -151,13 +234,11 @@ def normalize_scores(
 
             stds[metric] = 0.0
 
+    # =====================================================
+    # NORMALIZATION
+    # =====================================================
 
     normalized = {}
-
-
-    # =====================================================
-    # NORMALIZE MODELS
-    # =====================================================
 
     for model_name in results:
 
@@ -165,11 +246,17 @@ def normalize_scores(
 
         metrics = results[model_name]["metrics"]
 
-
         for metric in METRICS:
 
-            value = safe_metric(
+            raw_value = safe_metric(
+
                 metrics.get(metric, 0.0)
+
+            )
+
+            value = transform_metric(
+                metric,
+                raw_value
             )
 
             min_v = min_vals[metric]
@@ -178,45 +265,34 @@ def normalize_scores(
             mean_v = means[metric]
             std_v = stds[metric]
 
-
             # ==============================================
-            # HANDLE IDENTICAL VALUES
+            # IDENTICAL VALUES
             # ==============================================
 
             if max_v == min_v:
 
                 norm = 1.0
 
-
             else:
 
                 # ==========================================
-                # LATENCY TRANSFORMATION
-                # ==========================================
-
-                if metric == "latency":
-
-                    value = math.log(value + 1)
-
-                    min_v = math.log(min_v + 1)
-                    max_v = math.log(max_v + 1)
-
-
-                # ==========================================
-                # METHOD: MINMAX
+                # MINMAX
                 # ==========================================
 
                 if method == "minmax":
 
                     norm = (
+
                         (value - min_v)
+
                         /
+
                         (max_v - min_v)
+
                     )
 
-
                 # ==========================================
-                # METHOD: Z-SCORE
+                # ZSCORE
                 # ==========================================
 
                 elif method == "zscore":
@@ -228,72 +304,82 @@ def normalize_scores(
                     else:
 
                         z = (
+
                             (value - mean_v)
+
                             /
+
                             std_v
+
                         )
 
                         norm = (
-                            0.5 +
+
+                            0.5
+                            +
                             (z / 6)
+
                         )
 
-
                 # ==========================================
-                # METHOD: PERCENTILE
+                # PERCENTILE
                 # ==========================================
 
                 elif method == "percentile":
 
                     norm = percentile_rank(
+
                         value,
                         values[metric]
+
                     )
 
-
                 # ==========================================
-                # METHOD: HYBRID
+                # HYBRID
                 # ==========================================
 
                 else:
 
                     minmax = (
+
                         (value - min_v)
+
                         /
+
                         (max_v - min_v)
+
                     )
 
                     percentile = percentile_rank(
+
                         value,
                         values[metric]
+
                     )
 
                     norm = (
-                        (minmax * 0.7)
-                        +
-                        (percentile * 0.3)
-                    )
 
+                        (minmax * 0.7)
+
+                        +
+
+                        (percentile * 0.3)
+
+                    )
 
                 # ==========================================
                 # INVERSE METRICS
-                # LOWER IS BETTER
                 # ==========================================
 
-                if metric in [
-
-                    "latency",
-                    "variance"
-
-                ]:
+                if metric in INVERSE_METRICS:
 
                     norm = 1 - norm
 
-
             normalized[model_name][metric] = round(
+
                 clip(norm),
                 4
-            )
 
+            )
 
     return normalized
