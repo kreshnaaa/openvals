@@ -108,35 +108,25 @@ def benchmark(
     """
     Run OpenVals benchmark.
     """
-
     typer.echo(
 
         f"\n🚀 OpenVals AI Trust Platform "
         f"Starting... (v{__version__})\n"
 
     )
-
     # =====================================================
     # CREATE OUTPUT STRUCTURE
     # =====================================================
-
     create_output_structure()
-
     output_path = Path(output)
-
     if not output_path.parent.exists():
-
         output_path.parent.mkdir(
-
             parents=True,
             exist_ok=True
-
         )
-
     # =====================================================
     # LOAD DATASET
     # =====================================================
-
     dataset_data = load_builtin_dataset(
         dataset
     )

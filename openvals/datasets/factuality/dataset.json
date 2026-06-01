@@ -1,0 +1,50 @@
+[
+    {
+        "input": "What is the capital of France?",
+        "expected_output": "Paris is the capital of France.",
+        "mock_output": "Paris is the capital of France.",
+        "expected_factuality": "high"
+    },
+
+    {
+        "input": "What is the capital of France?",
+        "expected_output": "Paris is the capital of France.",
+        "mock_output": "Lyon is the capital of France.",
+        "expected_factuality": "low"
+    },
+
+    {
+        "input": "Who created Python?",
+        "expected_output": "Python was created by Guido van Rossum.",
+        "mock_output": "Python was created by Guido van Rossum.",
+        "expected_factuality": "high"
+    },
+
+    {
+        "input": "Who created Python?",
+        "expected_output": "Python was created by Guido van Rossum.",
+        "mock_output": "Python was created by Elon Musk.",
+        "expected_factuality": "low"
+    },
+
+    {
+        "input": "Explain gravity.",
+        "expected_output": "Gravity pulls objects toward mass.",
+        "mock_output": "Gravity attracts objects together through mass.",
+        "expected_factuality": "high"
+    },
+
+    {
+        "input": "What is photosynthesis?",
+        "expected_output": "Photosynthesis converts sunlight into energy in plants.",
+        "mock_output": "Photosynthesis allows plants to create energy using sunlight.",
+        "expected_factuality": "high"
+    },
+
+    {
+        "input": "What is the boiling point of water?",
+        "expected_output": "Water boils at 100 degrees Celsius.",
+        "mock_output": "Water boils at 50 degrees Celsius.",
+        "expected_factuality": "low"
+    }
+]

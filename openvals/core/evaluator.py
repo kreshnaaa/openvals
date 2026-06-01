@@ -1,6 +1,7 @@
 from openvals.core.evaluator_helpers import (
 
     run_accuracy,
+    run_factuality,
     run_semantic,
     run_reliability,
     run_safety,
@@ -8,7 +9,6 @@ from openvals.core.evaluator_helpers import (
     run_variance,
     run_hallucination,
     run_latency
-
 )
 
 from openvals.scoring.weighted import weighted_score
@@ -34,11 +34,12 @@ class Evaluator:
         self.weights = weights or {
 
             "accuracy": 0.25,
-            "semantic": 0.20,
-            "safety": 0.20,
+            "semantic": 0.15,
+            "safety": 0.15,
             "hallucination": 0.15,
+            "factuality": 0.20,
             "reliability": 0.10,
-            "latency": 0.10
+            "latency": 0.05
 
         }
 
@@ -59,7 +60,8 @@ class Evaluator:
             "safety": 0.0,
             "consistency": 0.0,
             "variance": 0.0,
-            "hallucination": 0.0
+            "hallucination": 0.0,
+            "factuality": 0.0
 
         }
 
@@ -214,21 +216,32 @@ class Evaluator:
                 hall = hpi_result[
                     "hpi_score"
                 ]
+                # =========================================
+                # FACTUALITY
+                # =========================================
+                factual_result = run_factuality(
+                    output,
+                    expected
+                )
+                factuality = factual_result["factuality_score"]
 
             except Exception as e:
 
                 output = f"ERROR: {str(e)}"
 
                 latency = 0.0
-
                 acc = 0.0
                 sem = 0.0
                 rel = 0.0
                 saf = 0.0
                 cons = 0.0
                 var = 0.0
-                hall = 1.0
-
+                hall = 0.0
+                factuality = 0.0
+                factual_result = {
+                    "factual_score": 0.0,
+                    "risk_level": "Critical",
+                }
                 hpi_result = {
 
                     "hpi_score": 1.0,
@@ -269,6 +282,7 @@ class Evaluator:
                     f"HPI Risk: "
                     f"{hpi_result['risk_level']}"
                 )
+                print(f"Factuality: {factuality:.3f}")
 
             # =============================================
             # AGGREGATION
@@ -282,6 +296,7 @@ class Evaluator:
             agg["consistency"] += cons
             agg["variance"] += var
             agg["hallucination"] += hall
+            agg["factuality"] += factuality
 
             # =============================================
             # STORE SAMPLE RESULT
@@ -310,9 +325,10 @@ class Evaluator:
                 "variance": round(var, 3),
 
                 "hallucination": round(hall, 3),
-
-                "hallucination_analysis":
-                    hpi_result
+                "hallucination_analysis": hpi_result,   
+                "factuality": round(factuality, 3),
+                "factual_analysis": factual_result
+                
 
             })
 

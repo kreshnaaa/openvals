@@ -123,7 +123,19 @@ METRIC_REGISTRY = {
 
     },
 
+    "factuality": {
 
+        "category": "trust",
+
+        "direction": "higher",
+
+        "weightable": True,
+
+        "description":
+        "Measures factual consistency and contradiction risk"
+
+    },
+    
     # =====================================================
     # INFRASTRUCTURE METRICS
     # =====================================================

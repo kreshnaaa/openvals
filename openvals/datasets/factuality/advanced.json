@@ -1,0 +1,50 @@
+[
+    {
+        "input": "Who invented electricity?",
+        "expected_output": "Electricity was not invented by a single person.",
+        "mock_output": "Nikola Tesla invented electricity in 1892.",
+        "expected_factuality": "very_low"
+    },
+
+    {
+        "input": "What planet is closest to the Sun?",
+        "expected_output": "Mercury is closest to the Sun.",
+        "mock_output": "Venus is definitely the closest planet to the Sun.",
+        "expected_factuality": "very_low"
+    },
+
+    {
+        "input": "Explain quantum computing.",
+        "expected_output": "Quantum computing uses quantum mechanics for computation.",
+        "mock_output": "Quantum computers use biological neurons to calculate instantly.",
+        "expected_factuality": "low"
+    },
+
+    {
+        "input": "What causes seasons on Earth?",
+        "expected_output": "Earth's axial tilt causes seasons.",
+        "mock_output": "Seasons happen because Earth moves closer to the Sun during summer.",
+        "expected_factuality": "low"
+    },
+
+    {
+        "input": "What is AI?",
+        "expected_output": "AI simulates intelligent behavior using algorithms.",
+        "mock_output": "AI is a biological consciousness inside computers.",
+        "expected_factuality": "very_low"
+    },
+
+    {
+        "input": "What is the speed of light?",
+        "expected_output": "The speed of light is about 299,792 km/s.",
+        "mock_output": "The speed of light is exactly 1 million km/s.",
+        "expected_factuality": "very_low"
+    },
+
+    {
+        "input": "What is cybersecurity?",
+        "expected_output": "Cybersecurity protects systems and networks from attacks.",
+        "mock_output": "Cybersecurity physically protects servers using metal shields.",
+        "expected_factuality": "low"
+    }
+]
