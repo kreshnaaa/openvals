@@ -92,6 +92,11 @@ def benchmark(
         ...,
         help="Comma-separated model names"
     ),
+    debug: bool = typer.Option(
+        False,
+        "--debug",
+        help="Enable detailed metric debugging"
+    ),
 
     report: bool = typer.Option(
         True,
@@ -206,10 +211,13 @@ def benchmark(
 
     typer.echo(
 
-        f"🤖 Models Loaded: "
+        f"Models Loaded: "
         f"{', '.join(loaded_models.keys())}\n"
-
     )
+    if debug:
+        typer.echo(
+            "Debug mode enabled\n"
+        )
 
     # =====================================================
     # RUN BENCHMARK
@@ -220,12 +228,11 @@ def benchmark(
         models=loaded_models,
         dataset=dataset_data,
         weights=weights,
-        debug=False
+        debug=debug
 
     )
 
     results = runner.run()
-
     # =====================================================
     # DRS RANKING
     # =====================================================
