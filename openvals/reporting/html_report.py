@@ -215,6 +215,11 @@ def generate_html_report(
             </td>
 
             <td>
+                {metric_status(m.get('factuality', 0))}
+                {m.get('factuality', 0):.3f}
+            </td>
+
+            <td>
                 {metric_status(m.get('reliability', 0))}
                 {m.get('reliability', 0):.3f}
             </td>
@@ -366,34 +371,24 @@ def generate_html_report(
     # =====================================================
 
     summary = recommendation.get(
-
         "summary",
-
         f"""
-
         OpenVals recommends
-
         <b>
-
             {
-
                 recommendation.get(
                     'recommended_model',
                     'Unknown'
                 )
-
             }
 
         </b>
-
-        based on DRS performance,
-        semantic capability,
+        based on overall trustworthiness,
+        factual accuracy, semantic quality,
         operational reliability,
         hallucination probability,
         and deployment confidence.
-
         """
-
     )
 
     # =====================================================
@@ -707,6 +702,22 @@ def generate_html_report(
 
             </div>
 
+            <div class="metric-box">
+
+                <b>Factuality</b><br>
+
+                {
+                    results[
+                    recommendation.get("recommended_model","unknown")
+                    ]["metrics"].get(
+                        'factuality',
+                        0
+                    )
+
+                }
+
+            </div>
+
             <hr>
 
             <p>
@@ -838,6 +849,22 @@ def generate_html_report(
 
             <ul>
                 {insights_html}
+                insights_html = "".join(
+                    [
+                        f"<li>{i}</li>"
+                        for i in recommendation.get(
+                            "insights",
+                            []
+                        )
+                    ]
+                )
+                # =====================================================
+                # FACTUALITY INSIGHT
+                # =====================================================
+                recommended_model = recommendation.get("recommended_model", "Unknown")
+                if recommended_model in results:
+                    factuality_score = results[recommended_model]["metrics"].get("factuality", 0)
+                    insights_html += f"<li>Factuality Score for {recommended_model}: {factuality_score:.3f}</li>"
             </ul>
 
         </div>
@@ -847,7 +874,7 @@ def generate_html_report(
         <div class="card">
 
             <h2>
-                ⚖️ Tradeoff Analysis
+                Tradeoff Analysis
             </h2>
 
             <ul>
@@ -900,6 +927,7 @@ def generate_html_report(
                     <th>Model</th>
                     <th>Accuracy</th>
                     <th>Semantic</th>
+                    <th>Factuality</th>
                     <th>Reliability</th>
                     <th>Safety</th>
                     <th>Consistency</th>
