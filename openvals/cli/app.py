@@ -444,7 +444,7 @@ def benchmark(
 
     typer.echo(
 
-        f"→ {recommendation['tradeoffs']}"
+        f"→ {recommendation.get('tradeoffs', 'N/A')}"
 
     )
 
@@ -454,7 +454,7 @@ def benchmark(
 
     typer.echo("\nRisks:")
 
-    for risk in recommendation["risks"]:
+    for risk in recommendation.get("risks", []):
 
         typer.echo(f"→ {risk}")
 
