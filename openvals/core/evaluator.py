@@ -14,6 +14,7 @@ from openvals.core.evaluator_helpers import (
 from openvals.scoring.weighted import weighted_score
 from openvals.scoring.drs import compute_drs
 
+import traceback
 
 class Evaluator:
 
@@ -226,7 +227,12 @@ class Evaluator:
                 factuality = factual_result["factuality_score"]
 
             except Exception as e:
-
+                print("\n====================")
+                print("OPENVALS ERROR")
+                print("====================")
+                print(f"Prompt: {prompt}")
+                print(traceback.format_exc())
+                
                 output = f"ERROR: {str(e)}"
 
                 latency = 0.0

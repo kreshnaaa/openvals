@@ -34,8 +34,8 @@ def numeric_consistency_score(
 
     expected_nums = extract_numbers(expected_text)
 
-    # No numbers involved
-    if not output_nums and not expected_nums:
+    # No numeric facts expected
+    if not expected_nums:
         return 1.0
 
     # Expected contains numbers but output doesn't
@@ -50,8 +50,6 @@ def numeric_consistency_score(
             matches += 1
 
     return matches / len(expected_nums)
-
-
 # =========================================================
 # FACTUALITY ENGINE
 # =========================================================
