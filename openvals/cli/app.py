@@ -220,7 +220,7 @@ def benchmark(
         models=loaded_models,
         dataset=dataset_data,
         weights=weights,
-        debug=True
+        debug=False
 
     )
 
@@ -267,6 +267,7 @@ def benchmark(
         f"{'Model':<15} "
         f"{'Acc':<8} "
         f"{'Sem':<8} "
+        f"{'Fact':<8} "
         f"{'Rel':<8} "
         f"{'Safe':<8} "
         f"{'Cons':<8} "
@@ -277,7 +278,7 @@ def benchmark(
 
     )
 
-    print("-" * 120)
+    print("-" * 140)
 
     for rank, (
 
@@ -301,12 +302,13 @@ def benchmark(
             f"{model_name:<15} "
             f"{metrics['accuracy']:<8.3f} "
             f"{metrics['semantic']:<8.3f} "
+            f"{metrics.get('factuality',0):<8.3f} "
             f"{metrics['reliability']:<8.3f} "
             f"{metrics['safety']:<8.3f} "
             f"{metrics['consistency']:<8.3f} "
             f"{metrics['variance']:<8.3f} "
             f"{metrics['hallucination']:<8.3f} "
-            f"{metrics['latency']:<12.2f} "
+            f"{metrics['latency(ms)']:<12.2f} "
             f"{drs_score:<8.3f}"
 
         )
@@ -334,28 +336,28 @@ def benchmark(
     typer.echo(
 
         f"✅ Recommended Model : "
-        f"{recommendation['recommended_model']}"
+        f"{recommendation.get('recommended_model', 'Unknown')}"
 
     )
 
     typer.echo(
 
         f"📊 Score             : "
-        f"{recommendation['score']}"
+        f"{recommendation.get('score', 0)}"
 
     )
 
     typer.echo(
 
         f"🧠 DRS               : "
-        f"{recommendation['drs']}"
+        f"{recommendation.get('drs', 0)}"
 
     )
 
     typer.echo(
 
         f"🎯 Confidence        : "
-        f"{recommendation['confidence']}"
+        f"{recommendation.get('confidence', 0)}"
 
     )
 
@@ -363,9 +365,10 @@ def benchmark(
     # HPI ANALYSIS
     # =====================================================
 
-    recommended_model = recommendation[
-        "recommended_model"
-    ]
+    recommended_model = recommendation.get(
+        "recommended_model",
+        "Unknown"
+    )
 
     hallucination_score = results[
         recommended_model
@@ -374,11 +377,22 @@ def benchmark(
         0
     )
 
+    factuality_score = results[
+        recommended_model
+    ]["metrics"].get(
+        "factuality",
+        0
+    )
+
     typer.echo(
 
         f"🧪 Hallucination Risk: "
         f"{hallucination_score:.3f}"
 
+    )
+    typer.echo(
+        f"📚 Factuality Score  : "
+        f"{factuality_score:.3f}"
     )
 
     if hallucination_score <= 0.20:
@@ -399,6 +413,17 @@ def benchmark(
             "🔴 High hallucination risk"
         )
 
+    typer.echo("\n=== TRUST SUMMARY ===\n")
+    drs = recommendation["drs"]
+    if drs >= 0.85:
+        typer.echo("🟢 Production Ready")
+    elif drs >= 0.60:
+        typer.echo("🟡 Caution Advised with Enterprise Capable")
+    elif drs >= 0.35:
+        typer.echo("🔴 Not Recommended Further Validation Recommended")
+    else:
+        typer.echo("⚠️ Critical Risk - Not Recommended")
+
     # =====================================================
     # WHY
     # =====================================================
@@ -407,7 +432,7 @@ def benchmark(
 
     typer.echo(
 
-        f"→ {recommendation['reason']}"
+        f"→ {recommendation.get('reason', 'N/A')}"
 
     )
 
@@ -456,24 +481,18 @@ def benchmark(
     if report:
 
         typer.echo(
-
-            "\n📄 Generating enterprise "
-            "HTML report..."
-
+            "\n📄 OpenVals AI Trust Assessment"
+            "Evaluate • Benchmark • Trust Intelligence\n"
         )
 
         generate_html_report(
-
             results=results,
-
             recommendation=recommendation,
-
             output_file=str(output_path)
-
         )
 
         typer.echo(
-            "\n✅ HTML report generated:"
+            "\n✅ OpenVals AI Trust Assessment Complete:"
         )
 
         typer.echo(

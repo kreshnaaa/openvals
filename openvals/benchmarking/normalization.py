@@ -14,7 +14,8 @@ METRICS = [
     "safety",
     "consistency",
     "variance",
-    "hallucination"
+    "hallucination",
+    "factuality"
 
 ]
 

@@ -70,6 +70,8 @@ def weighted_score(
             0
         ),
 
+        "factuality": metrics.get("factuality", 0),
+
         "latency": latency_score
 
     }
