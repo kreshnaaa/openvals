@@ -3,7 +3,10 @@ import os
 
 from openvals.reporting.charts import generate_all_charts
 from openvals.reporting.report_styles import get_report_styles
+from openvals.reporting.report_sections import (
+    build_hero_section
 
+)
 
 # =========================================================
 # TRUST CLASSIFICATION
@@ -21,7 +24,7 @@ def classify_trust(drs):
         return "🟠 Experimental"
 
     else:
-        return "🔴 Unsafe / Unstable"
+        return "🔴 Unsafe/Unstable"
 
 
 # =========================================================
@@ -276,172 +279,169 @@ def generate_html_report(
     html = f"""
     <html>
     <head>
-        <title>OpenVals AI Evaluation Report</title>
-
-        <style>
+        <title>OpenVals  AI Trust Evaluation Report</title>
             {get_report_styles()}
-        </style>
     </head>
 
     <body>
-        <h1>OpenVals AI Evaluation Report</h1>
+        <div class="report-shell">
+            {build_hero_section(
+                recommendation,
+                trust,
+                timestamp
+            )}
+            <div class="card success">
+                <h2>Executive Summary</h2>
+                <p>{summary}</p>
 
-        <div class="subtitle">
-            Generated on {timestamp}
-        </div>
-
-        <div class="card success">
-            <h2>Executive Summary</h2>
-            <p>{summary}</p>
-
-            <div class="trust">
-                Trust Classification: {trust}
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>AI Advisor Recommendation</h2>
-
-            <p>
-                <b>Recommended Model:</b>
-                <span class="highlight">
-                    {recommendation.get('recommended_model', 'Unknown')}
-                </span>
-            </p>
-
-            <div class="metric-box">
-                <b>Score</b><br>
-                {recommendation.get('score', 0)}
+                <div class="trust">
+                    Trust Classification: {trust}
+                </div>
             </div>
 
-            <div class="metric-box">
-                <b>DRS</b><br>
-                {recommendation.get('drs', 0)}
+            <div class="card">
+                <h2>AI Advisor Recommendation</h2>
+
+                <p>
+                    <b>Recommended Model:</b>
+                    <span class="highlight">
+                        {recommendation.get('recommended_model', 'Unknown')}
+                    </span>
+                </p>
+
+                <div class="metric-box">
+                    <b>Score</b><br>
+                    {recommendation.get('score', 0)}
+                </div>
+
+                <div class="metric-box">
+                    <b>DRS</b><br>
+                    {recommendation.get('drs', 0)}
+                </div>
+
+                <div class="metric-box">
+                    <b>Confidence</b><br>
+                    {recommendation.get('confidence', 0)}
+                </div>
+
+                <div class="metric-box">
+                    <b>Factuality</b><br>
+                    {recommended_factuality:.3f}
+                </div>
+
+                <hr>
+
+                <p>
+                    <b>Why Recommended:</b><br>
+                    {recommendation.get('reason', 'No reason provided')}
+                </p>
+
+                <p>
+                    <b>Trade-offs:</b><br>
+                    {recommendation.get('tradeoffs', 'None')}
+                </p>
             </div>
 
-            <div class="metric-box">
-                <b>Confidence</b><br>
-                {recommendation.get('confidence', 0)}
+            <div class="card">
+                <h2>Visual Intelligence Dashboard</h2>
+
+                <h3>Radar Analysis</h3>
+                <img src="{radar_chart}" class="chart" alt="Radar Chart">
+
+                <hr>
+
+                <h3>Latency Comparison</h3>
+                <img src="{latency_chart}" class="chart" alt="Latency Chart">
+
+                <hr>
+
+                <h3>DRS Comparison</h3>
+                <img src="{drs_chart}" class="chart" alt="DRS Chart">
+
+                <hr>
+
+                <h3>Hallucination Risk Comparison</h3>
+                <img
+                    src="{hallucination_chart}"
+                    class="chart"
+                    alt="Hallucination Chart"
+                >
             </div>
 
-            <div class="metric-box">
-                <b>Factuality</b><br>
-                {recommended_factuality:.3f}
+            <div class="card">
+                <h2>Deployment Readiness</h2>
+
+                <div class="deployment">
+                    {deployment.get("readiness", "Unknown")}
+                </div>
+
+                <ul>
+                    {deployment_html}
+                </ul>
             </div>
 
-            <hr>
+            <div class="card info">
+                <h2>Operational Insights</h2>
 
-            <p>
-                <b>Why Recommended:</b><br>
-                {recommendation.get('reason', 'No reason provided')}
-            </p>
-
-            <p>
-                <b>Trade-offs:</b><br>
-                {recommendation.get('tradeoffs', 'None')}
-            </p>
-        </div>
-
-        <div class="card">
-            <h2>Visual Intelligence Dashboard</h2>
-
-            <h3>Radar Analysis</h3>
-            <img src="{radar_chart}" class="chart" alt="Radar Chart">
-
-            <hr>
-
-            <h3>Latency Comparison</h3>
-            <img src="{latency_chart}" class="chart" alt="Latency Chart">
-
-            <hr>
-
-            <h3>DRS Comparison</h3>
-            <img src="{drs_chart}" class="chart" alt="DRS Chart">
-
-            <hr>
-
-            <h3>Hallucination Risk Comparison</h3>
-            <img
-                src="{hallucination_chart}"
-                class="chart"
-                alt="Hallucination Chart"
-            >
-        </div>
-
-        <div class="card">
-            <h2>Deployment Readiness</h2>
-
-            <div class="deployment">
-                {deployment.get("readiness", "Unknown")}
+                <ul>
+                    {insights_html}
+                </ul>
             </div>
 
-            <ul>
-                {deployment_html}
-            </ul>
-        </div>
+            <div class="card">
+                <h2>Tradeoff Analysis</h2>
 
-        <div class="card info">
-            <h2>Operational Insights</h2>
+                <ul>
+                    {tradeoffs_detail_html}
+                </ul>
+            </div>
 
-            <ul>
-                {insights_html}
-            </ul>
-        </div>
+            <div class="card warning">
+                <h2>Risk Analysis</h2>
 
-        <div class="card">
-            <h2>Tradeoff Analysis</h2>
+                <ul>
+                    {risks_html}
+                </ul>
+            </div>
 
-            <ul>
-                {tradeoffs_detail_html}
-            </ul>
-        </div>
+            <div class="card warning">
+                <h2>Detected Anomalies</h2>
 
-        <div class="card warning">
-            <h2>Risk Analysis</h2>
+                <ul>
+                    {anomalies_html}
+                </ul>
+            </div>
 
-            <ul>
-                {risks_html}
-            </ul>
-        </div>
+            <div class="card">
+                <h2>Model Leaderboard</h2>
 
-        <div class="card warning">
-            <h2>Detected Anomalies</h2>
+                <table>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Semantic</th>
+                        <th>Factuality</th>
+                        <th>Reliability</th>
+                        <th>Safety</th>
+                        <th>Consistency</th>
+                        <th>Variance</th>
+                        <th>Hallucination</th>
+                        <th>Latency(ms)</th>
+                        <th>DRS</th>
+                    </tr>
 
-            <ul>
-                {anomalies_html}
-            </ul>
-        </div>
+                    {rows}
+                </table>
+            </div>
 
-        <div class="card">
-            <h2>Model Leaderboard</h2>
+                <div class="footer">
+                    Built with OpenVals •
+                    AI Trust & Validation Platform
 
-            <table>
-                <tr>
-                    <th>Rank</th>
-                    <th>Model</th>
-                    <th>Accuracy</th>
-                    <th>Semantic</th>
-                    <th>Factuality</th>
-                    <th>Reliability</th>
-                    <th>Safety</th>
-                    <th>Consistency</th>
-                    <th>Variance</th>
-                    <th>Hallucination</th>
-                    <th>Latency(ms)</th>
-                    <th>DRS</th>
-                </tr>
-
-                {rows}
-            </table>
-        </div>
-
-        <div class="footer">
-            Built with OpenVals •
-            AI Trust & Validation Framework
-
-            <br><br>
-
-            Developed by DrPinnacle
+                <br><br>
+                Developed by DrPinnacle
+            </div>
         </div>
     </body>
     </html>
@@ -455,5 +455,5 @@ def generate_html_report(
         f.write(html)
 
     print(
-        f"✅ HTML report generated: {output_file}"
+        f"✅ Report generated: {output_file}"
     )
