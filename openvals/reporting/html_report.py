@@ -1,9 +1,8 @@
 from datetime import datetime
 import os
 
-from openvals.reporting.charts import (
-    generate_all_charts
-)
+from openvals.reporting.charts import generate_all_charts
+
 
 # =========================================================
 # TRUST CLASSIFICATION
@@ -23,17 +22,12 @@ def classify_trust(drs):
     else:
         return "🔴 Unsafe / Unstable"
 
+
 # =========================================================
 # METRIC STATUS
 # =========================================================
 
-def metric_status(
-
-    value,
-    high=0.8,
-    medium=0.6
-
-):
+def metric_status(value, high=0.8, medium=0.6):
 
     if value >= high:
         return "🟢"
@@ -42,6 +36,7 @@ def metric_status(
         return "🟡"
 
     return "🔴"
+
 
 # =========================================================
 # HALLUCINATION STATUS
@@ -58,136 +53,82 @@ def hallucination_status(value):
 
     return "🔴"
 
+
 # =========================================================
 # GENERATE HTML REPORT
 # =========================================================
 
 def generate_html_report(
-
     results,
     recommendation,
     output_file="report.html",
     charts_dir="charts"
-
 ):
 
-    # =====================================================
-    # SAFE DEFAULTS
-    # =====================================================
-
     if recommendation is None:
-
         recommendation = {}
 
-    deployment = recommendation.get(
-        "deployment"
-    ) or {}
+    deployment = recommendation.get("deployment") or {}
 
-    deployment.setdefault(
-        "readiness",
-        "Unknown"
-    )
-
-    deployment.setdefault(
-        "recommendations",
-        []
-    )
-
-    deployment.setdefault(
-        "risks",
-        []
-    )
-
-    # =====================================================
-    # CREATE DIRECTORIES
-    # =====================================================
+    deployment.setdefault("readiness", "Unknown")
+    deployment.setdefault("recommendations", [])
+    deployment.setdefault("risks", [])
 
     output_dir = os.path.dirname(
         os.path.abspath(output_file)
     )
 
     if output_dir:
-
-        os.makedirs(
-            output_dir,
-            exist_ok=True
-        )
+        os.makedirs(output_dir, exist_ok=True)
 
     charts_path = os.path.join(
         output_dir,
         charts_dir
     )
 
-    os.makedirs(
-        charts_path,
-        exist_ok=True
-    )
+    os.makedirs(charts_path, exist_ok=True)
 
-    # =====================================================
-    # GENERATE CHARTS
-    # =====================================================
-
-    chart_files = generate_all_charts(
-
+    generate_all_charts(
         results,
         charts_path
-
     )
 
-    # =====================================================
-    # RELATIVE IMAGE PATHS
-    # =====================================================
-
-    radar_chart = (
-        f"{charts_dir}/radar_chart.png"
-    )
-
-    latency_chart = (
-        f"{charts_dir}/latency_chart.png"
-    )
-
-    drs_chart = (
-        f"{charts_dir}/drs_chart.png"
-    )
-
-    hallucination_chart = (
-        f"{charts_dir}/hallucination_chart.png"
-    )
-
-    # =====================================================
-    # SORT MODELS
-    # =====================================================
+    radar_chart = f"{charts_dir}/radar_chart.png"
+    latency_chart = f"{charts_dir}/latency_chart.png"
+    drs_chart = f"{charts_dir}/drs_chart.png"
+    hallucination_chart = f"{charts_dir}/hallucination_chart.png"
 
     ranked = sorted(
-
         results.items(),
-
-        key=lambda x: x[1].get(
-            "drs_score",
-            0
-        ),
-
+        key=lambda x: x[1].get("drs_score", 0),
         reverse=True
-
     )
 
-    # =====================================================
-    # BUILD TABLE ROWS
-    # =====================================================
+    recommended_model = recommendation.get(
+        "recommended_model",
+        ""
+    )
 
-    rows = ""
+    recommended_metrics = {}
 
-    for i, (model, data) in enumerate(
-
-        ranked,
-        1
-
-    ):
-
-        m = data.get(
+    if recommended_model in results:
+        recommended_metrics = results[
+            recommended_model
+        ].get(
             "metrics",
             {}
         )
+
+    recommended_factuality = recommended_metrics.get(
+        "factuality",
+        0
+    )
+
+    rows = ""
+
+    for i, (model, data) in enumerate(ranked, 1):
+
+        m = data.get("metrics", {})
 
         hallucination = m.get(
             "hallucination",
@@ -195,9 +136,7 @@ def generate_html_report(
         )
 
         rows += f"""
-
         <tr>
-
             <td>{i}</td>
 
             <td>
@@ -249,140 +188,78 @@ def generate_html_report(
             </td>
 
             <td>
-                <b>
-                    {data.get('drs_score', 0):.3f}
-                </b>
+                <b>{data.get('drs_score', 0):.3f}</b>
             </td>
-
         </tr>
-
         """
 
-    # =====================================================
-    # RISKS
-    # =====================================================
-
     risks_html = "".join(
-
         [
-
             f"<li>{r}</li>"
-
             for r in recommendation.get(
                 "risks",
                 []
             )
-
         ]
-
     )
 
-    # =====================================================
-    # INSIGHTS
-    # =====================================================
-
     insights_html = "".join(
-
         [
-
             f"<li>{i}</li>"
-
             for i in recommendation.get(
                 "insights",
                 []
             )
-
         ]
-
     )
 
-    # =====================================================
-    # TRADEOFF DETAILS
-    # =====================================================
+    if recommended_model in results:
+
+        insights_html += (
+            f"<li>Factuality Score for "
+            f"{recommended_model}: "
+            f"<b>{recommended_factuality:.3f}</b></li>"
+        )
 
     tradeoffs_detail_html = "".join(
-
         [
-
             f"<li>{t}</li>"
-
             for t in recommendation.get(
                 "tradeoffs_detail",
                 []
             )
-
         ]
-
     )
 
-    # =====================================================
-    # ANOMALIES
-    # =====================================================
-
     anomalies_html = "".join(
-
         [
-
             f"<li>{a}</li>"
-
             for a in recommendation.get(
                 "anomalies",
                 []
             )
-
         ]
-
     )
 
-    # =====================================================
-    # DEPLOYMENT DETAILS
-    # =====================================================
-
     deployment_html = "".join(
-
         [
-
             f"<li>{d}</li>"
-
             for d in deployment.get(
                 "recommendations",
                 []
             )
-
         ]
-
     )
-
-    # =====================================================
-    # TRUST CLASSIFICATION
-    # =====================================================
 
     trust = classify_trust(
-
-        recommendation.get(
-            "drs",
-            0
-        )
-
+        recommendation.get("drs", 0)
     )
-
-    # =====================================================
-    # EXECUTIVE SUMMARY
-    # =====================================================
 
     summary = recommendation.get(
         "summary",
         f"""
         OpenVals recommends
-        <b>
-            {
-                recommendation.get(
-                    'recommended_model',
-                    'Unknown'
-                )
-            }
-
-        </b>
+        <b>{recommendation.get('recommended_model', 'Unknown')}</b>
         based on overall trustworthiness,
         factual accuracy, semantic quality,
         operational reliability,
@@ -391,38 +268,22 @@ def generate_html_report(
         """
     )
 
-    # =====================================================
-    # TIMESTAMP
-    # =====================================================
-
     timestamp = datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S"
     )
 
-    # =====================================================
-    # HTML TEMPLATE
-    # =====================================================
-
     html = f"""
-
     <html>
-
     <head>
-
-        <title>
-            OpenVals AI Evaluation Report
-        </title>
+        <title>OpenVals AI Evaluation Report</title>
 
         <style>
-
             body {{
-
                 font-family: Arial, sans-serif;
                 background: #f4f7fb;
                 margin: 0;
                 padding: 30px;
                 color: #222;
-
             }}
 
             h1 {{
@@ -440,116 +301,79 @@ def generate_html_report(
             }}
 
             .subtitle {{
-
                 color: #666;
                 margin-bottom: 30px;
-
             }}
 
             .card {{
-
                 background: white;
                 padding: 24px;
                 margin-bottom: 25px;
                 border-radius: 14px;
-
-                box-shadow:
-                    0 4px 12px rgba(0,0,0,0.08);
-
-                border-left:
-                    6px solid #4f46e5;
-
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                border-left: 6px solid #4f46e5;
             }}
 
             .warning {{
-
-                border-left:
-                    6px solid #ef4444;
-
+                border-left: 6px solid #ef4444;
             }}
 
             .success {{
-
-                border-left:
-                    6px solid #16a34a;
-
+                border-left: 6px solid #16a34a;
             }}
 
             .info {{
-
-                border-left:
-                    6px solid #0284c7;
-
+                border-left: 6px solid #0284c7;
             }}
 
             .highlight {{
-
                 color: #0b7a32;
                 font-weight: bold;
-
             }}
 
             .trust {{
-
                 font-size: 20px;
                 font-weight: bold;
                 margin-top: 10px;
-
             }}
 
             .deployment {{
-
                 font-size: 18px;
                 font-weight: bold;
                 margin-bottom: 10px;
                 color: #2563eb;
-
             }}
 
             table {{
-
                 width: 100%;
                 border-collapse: collapse;
                 margin-top: 15px;
-
             }}
 
             th {{
-
                 background: #111827;
                 color: white;
                 padding: 14px;
                 text-align: center;
-
             }}
 
             td {{
-
                 padding: 12px;
-
-                border-bottom:
-                    1px solid #e5e7eb;
-
+                border-bottom: 1px solid #e5e7eb;
                 text-align: center;
                 background: white;
-
             }}
 
             tr:hover td {{
-
                 background: #f9fafb;
-
             }}
 
             ul {{
-
                 margin-top: 8px;
                 line-height: 1.7;
-
             }}
 
             .metric-box {{
-
                 display: inline-block;
                 margin-right: 20px;
                 margin-top: 10px;
@@ -558,371 +382,165 @@ def generate_html_report(
                 background: #f9fafb;
                 border-radius: 10px;
                 text-align: center;
-
             }}
 
             .chart {{
-
                 width: 100%;
                 max-width: 850px;
                 margin-top: 20px;
                 border-radius: 10px;
-
-                border:
-                    1px solid #e5e7eb;
-
+                border: 1px solid #e5e7eb;
             }}
 
             .footer {{
-
                 text-align: center;
                 margin-top: 40px;
                 color: #777;
                 font-size: 14px;
-
             }}
 
             hr {{
-
                 border: none;
-
-                border-top:
-                    1px solid #e5e7eb;
-
+                border-top: 1px solid #e5e7eb;
                 margin: 20px 0;
-
             }}
-
         </style>
-
     </head>
 
     <body>
-
-        <h1>
-            OpenVals AI Evaluation Report
-        </h1>
+        <h1>OpenVals AI Evaluation Report</h1>
 
         <div class="subtitle">
             Generated on {timestamp}
         </div>
 
-        <!-- EXECUTIVE SUMMARY -->
-
         <div class="card success">
-
-            <h2>
-                Executive Summary
-            </h2>
-
-            <p>
-                {summary}
-            </p>
+            <h2>Executive Summary</h2>
+            <p>{summary}</p>
 
             <div class="trust">
-
-                Trust Classification:
-                {trust}
-
+                Trust Classification: {trust}
             </div>
-
         </div>
 
-        <!-- RECOMMENDATION -->
-
         <div class="card">
-
-            <h2>
-                AI Advisor Recommendation
-            </h2>
+            <h2>AI Advisor Recommendation</h2>
 
             <p>
-
-                <b>
-                    Recommended Model:
-                </b>
-
+                <b>Recommended Model:</b>
                 <span class="highlight">
-
-                    {
-
-                        recommendation.get(
-                            'recommended_model',
-                            'Unknown'
-                        )
-
-                    }
-
+                    {recommendation.get('recommended_model', 'Unknown')}
                 </span>
-
             </p>
 
             <div class="metric-box">
-
                 <b>Score</b><br>
-
-                {
-
-                    recommendation.get(
-                        'score',
-                        0
-                    )
-
-                }
-
+                {recommendation.get('score', 0)}
             </div>
 
             <div class="metric-box">
-
                 <b>DRS</b><br>
-
-                {
-
-                    recommendation.get(
-                        'drs',
-                        0
-                    )
-
-                }
-
+                {recommendation.get('drs', 0)}
             </div>
 
             <div class="metric-box">
-
                 <b>Confidence</b><br>
-
-                {
-
-                    recommendation.get(
-                        'confidence',
-                        0
-                    )
-
-                }
-
+                {recommendation.get('confidence', 0)}
             </div>
 
             <div class="metric-box">
-
                 <b>Factuality</b><br>
-
-                {
-                    results[
-                    recommendation.get("recommended_model","unknown")
-                    ]["metrics"].get(
-                        'factuality',
-                        0
-                    )
-
-                }
-
+                {recommended_factuality:.3f}
             </div>
 
             <hr>
 
             <p>
-
-                <b>
-                    Why Recommended:
-                </b><br>
-
-                {
-
-                    recommendation.get(
-                        'reason',
-                        'No reason provided'
-                    )
-
-                }
-
+                <b>Why Recommended:</b><br>
+                {recommendation.get('reason', 'No reason provided')}
             </p>
 
             <p>
-
-                <b>
-                    Trade-offs:
-                </b><br>
-
-                {
-
-                    recommendation.get(
-                        'tradeoffs',
-                        'None'
-                    )
-
-                }
-
+                <b>Trade-offs:</b><br>
+                {recommendation.get('tradeoffs', 'None')}
             </p>
-
         </div>
 
-        <!-- VISUAL ANALYTICS -->
-
         <div class="card">
+            <h2>Visual Intelligence Dashboard</h2>
 
-            <h2>
-                Visual Intelligence Dashboard
-            </h2>
-
-            <h3>
-                Radar Analysis
-            </h3>
-
-            <img
-                src="{radar_chart}"
-                class="chart"
-                alt="Radar Chart"
-            >
+            <h3>Radar Analysis</h3>
+            <img src="{radar_chart}" class="chart" alt="Radar Chart">
 
             <hr>
 
-            <h3>
-                Latency Comparison
-            </h3>
-
-            <img
-                src="{latency_chart}"
-                class="chart"
-                alt="Latency Chart"
-            >
+            <h3>Latency Comparison</h3>
+            <img src="{latency_chart}" class="chart" alt="Latency Chart">
 
             <hr>
 
-            <h3>
-                DRS Comparison
-            </h3>
-
-            <img
-                src="{drs_chart}"
-                class="chart"
-                alt="DRS Chart"
-            >
+            <h3>DRS Comparison</h3>
+            <img src="{drs_chart}" class="chart" alt="DRS Chart">
 
             <hr>
 
-            <h3>
-                Hallucination Risk Comparison
-            </h3>
-
+            <h3>Hallucination Risk Comparison</h3>
             <img
                 src="{hallucination_chart}"
                 class="chart"
                 alt="Hallucination Chart"
             >
-
         </div>
 
-        <!-- DEPLOYMENT -->
-
         <div class="card">
-
-            <h2>
-                Deployment Readiness
-            </h2>
+            <h2>Deployment Readiness</h2>
 
             <div class="deployment">
-
-                {
-
-                    deployment.get(
-                        "readiness",
-                        "Unknown"
-                    )
-
-                }
-
+                {deployment.get("readiness", "Unknown")}
             </div>
 
             <ul>
                 {deployment_html}
             </ul>
-
         </div>
 
-        <!-- INSIGHTS -->
-
         <div class="card info">
-
-            <h2>
-                Operational Insights
-            </h2>
+            <h2>Operational Insights</h2>
 
             <ul>
                 {insights_html}
-                insights_html = "".join(
-                    [
-                        f"<li>{i}</li>"
-                        for i in recommendation.get(
-                            "insights",
-                            []
-                        )
-                    ]
-                )
-                # =====================================================
-                # FACTUALITY INSIGHT
-                # =====================================================
-                recommended_model = recommendation.get("recommended_model", "Unknown")
-                if recommended_model in results:
-                    factuality_score = results[recommended_model]["metrics"].get("factuality", 0)
-                    insights_html += f"<li>Factuality Score for {recommended_model}: {factuality_score:.3f}</li>"
             </ul>
-
         </div>
 
-        <!-- TRADEOFFS -->
-
         <div class="card">
-
-            <h2>
-                Tradeoff Analysis
-            </h2>
+            <h2>Tradeoff Analysis</h2>
 
             <ul>
                 {tradeoffs_detail_html}
             </ul>
-
         </div>
 
-        <!-- RISKS -->
-
         <div class="card warning">
-
-            <h2>
-                Risk Analysis
-            </h2>
+            <h2>Risk Analysis</h2>
 
             <ul>
                 {risks_html}
             </ul>
-
         </div>
 
-        <!-- ANOMALIES -->
-
         <div class="card warning">
-
-            <h2>
-                Detected Anomalies
-            </h2>
+            <h2>Detected Anomalies</h2>
 
             <ul>
                 {anomalies_html}
             </ul>
-
         </div>
 
-        <!-- LEADERBOARD -->
-
         <div class="card">
-
-            <h2>
-                Model Leaderboard
-            </h2>
+            <h2>Model Leaderboard</h2>
 
             <table>
-
                 <tr>
-
                     <th>Rank</th>
                     <th>Model</th>
                     <th>Accuracy</th>
@@ -935,51 +553,31 @@ def generate_html_report(
                     <th>Hallucination</th>
                     <th>Latency(ms)</th>
                     <th>DRS</th>
-
                 </tr>
 
                 {rows}
-
             </table>
-
         </div>
 
-        <!-- FOOTER -->
-
         <div class="footer">
-
             Built with OpenVals •
             AI Trust & Validation Framework
 
             <br><br>
 
             Developed by DrPinnacle
-
         </div>
-
     </body>
-
     </html>
-
     """
 
-    # =====================================================
-    # SAVE HTML REPORT
-    # =====================================================
-
     with open(
-
         output_file,
         "w",
         encoding="utf-8"
-
     ) as f:
-
         f.write(html)
 
     print(
-
-        f"✅ HTML report generated: "
-        f"{output_file}"
-
+        f"✅ HTML report generated: {output_file}"
     )
