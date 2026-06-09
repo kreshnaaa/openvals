@@ -97,6 +97,16 @@ def benchmark(
         "--debug",
         help="Enable detailed metric debugging"
     ),
+    parallel: bool = typer.Option(
+        False,
+        "--parallel",
+        help="Run benchmarks in parallel (multi-threaded)"
+    ),
+    max_workers: int = typer.Option(
+        3,
+        "--max-workers",
+        help="Max workers for parallel execution"
+    ),
 
     report: bool = typer.Option(
         True,
@@ -156,7 +166,7 @@ def benchmark(
             "recommended_weights"
         ]
 
-    typer.echo("📦 Dataset Loaded")
+    typer.echo("Dataset Loaded")
 
     typer.echo(
         f"Dataset : {metadata['name']}"
@@ -214,6 +224,11 @@ def benchmark(
         f"Models Loaded: "
         f"{', '.join(loaded_models.keys())}\n"
     )
+    if parallel:
+        typer.echo(
+            f"⚡ Running benchmarks in parallel "
+            f"with max workers: {max_workers}\n"
+        )
     if debug:
         typer.echo(
             "Debug mode enabled\n"
@@ -228,7 +243,9 @@ def benchmark(
         models=loaded_models,
         dataset=dataset_data,
         weights=weights,
-        debug=debug
+        debug=debug,
+        parallel=parallel,
+        max_workers=max_workers
 
     )
 
