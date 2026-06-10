@@ -1,0 +1,10 @@
+[
+  {
+    "prompt": "What is AI?",
+    "expected_output": "Artificial Intelligence"
+  },
+  {
+    "prompt": "",
+    "expected_output": "Paris"
+  }
+]

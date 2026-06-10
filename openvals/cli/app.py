@@ -10,6 +10,11 @@ from openvals.datasets.loader import (
 from openvals.datasets.metadata import (
     load_dataset_metadata
 )
+from openvals.datasets.validators.dataset_validator import (
+    validate_dataset,
+    validate_dataset_object,
+    print_validation_report
+)
 
 from openvals.datasets.registry import (
     DATASETS
@@ -33,6 +38,9 @@ from openvals.recommendation.engine import (
 
 from openvals.reporting.html_report import (
     generate_html_report
+)
+from openvals.reporting.sample_report import (
+    generate_sample_report
 )
 
 from openvals.utils.paths import (
@@ -514,13 +522,24 @@ def benchmark(
             recommendation=recommendation,
             output_file=str(output_path)
         )
+        sample_report_path = (
+            output_path.parent /
+            f"sample_report_{dataset}.html"
+        )
+        generate_sample_report(
+            results=results,
+            output_file=str(sample_report_path)
+        )
 
         typer.echo(
             "\n✅ OpenVals AI Trust Assessment Complete:"
         )
-
         typer.echo(
-            f"📁 {output_path.resolve()}"
+            f"📄 Dashboard saved to: {output_path.resolve()}"
+
+        )
+        typer.echo(
+            f"📄 Sample report saved to: {sample_report_path.resolve()}"
         )
 
         typer.echo(
@@ -531,10 +550,56 @@ def benchmark(
             "📁 outputs/charts/"
         )
 
+
+# =========================================================
+# VALIDATE DATASET
+# =========================================================
+
+@app.command("validate-dataset")
+def validate_dataset_cli(
+
+    dataset: str = typer.Argument(
+        ...,
+        help="Dataset name or local dataset path"
+    )
+
+):
+
+    """
+    Validate an OpenVals built-in dataset or local JSON/CSV file.
+    """
+
+    typer.echo(
+        f"\n🔍 Validating dataset: {dataset}"
+    )
+
+    try:
+        if dataset in DATASETS:
+            dataset_data = load_builtin_dataset(
+                dataset
+            )
+            result = validate_dataset_object(
+                dataset_data
+            )
+        else:
+            result = validate_dataset(
+                dataset
+            )
+
+        print_validation_report(
+            result
+        )
+
+    except Exception as e:
+
+        typer.echo(
+            f"\n❌ Dataset validation failed: {str(e)}"
+        )
+
+        raise typer.Exit(code=1)
 # =========================================================
 # DATASETS
 # =========================================================
-
 @app.command("datasets")
 def datasets():
 
