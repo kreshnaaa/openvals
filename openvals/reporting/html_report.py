@@ -3,10 +3,23 @@ import os
 
 from openvals.reporting.charts import generate_all_charts
 from openvals.reporting.report_styles import get_report_styles
-from openvals.reporting.report_sections import (
-    build_hero_section
 
+from openvals.reporting.report_sections import (
+    build_hero_section,
+    build_executive_summary,
+    build_executive_metric_cards,
+    build_ai_advisor_section,
+    build_trust_intelligence_dashboard,
+    build_visual_dashboard,
+    build_deployment_section,
+    build_insights_section,
+    build_tradeoffs_section,
+    build_risk_section,
+    build_leaderboard_section,
+    build_governance_section,
+    build_footer
 )
+
 
 # =========================================================
 # TRUST CLASSIFICATION
@@ -24,7 +37,7 @@ def classify_trust(drs):
         return "🟠 Experimental"
 
     else:
-        return "🔴 Unsafe/Unstable"
+        return "🔴 Unsafe / Unstable"
 
 
 # =========================================================
@@ -59,6 +72,20 @@ def hallucination_status(value):
 
 
 # =========================================================
+# LIST BUILDER
+# =========================================================
+
+def build_list_html(items):
+
+    return "".join(
+        [
+            f"<li>{item}</li>"
+            for item in items
+        ]
+    )
+
+
+# =========================================================
 # GENERATE HTML REPORT
 # =========================================================
 
@@ -66,7 +93,9 @@ def generate_html_report(
     results,
     recommendation,
     output_file="report.html",
-    charts_dir="charts"
+    charts_dir="charts",
+    dataset_name="OpenVals Benchmark",
+    config_name="Default"
 ):
 
     if recommendation is None:
@@ -74,23 +103,48 @@ def generate_html_report(
 
     deployment = recommendation.get("deployment") or {}
 
-    deployment.setdefault("readiness", "Unknown")
-    deployment.setdefault("recommendations", [])
-    deployment.setdefault("risks", [])
+    deployment.setdefault(
+        "readiness",
+        "Unknown"
+    )
+
+    deployment.setdefault(
+        "recommendations",
+        []
+    )
+
+    deployment.setdefault(
+        "risks",
+        []
+    )
+
+    # =====================================================
+    # DIRECTORIES
+    # =====================================================
 
     output_dir = os.path.dirname(
         os.path.abspath(output_file)
     )
 
     if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(
+            output_dir,
+            exist_ok=True
+        )
 
     charts_path = os.path.join(
         output_dir,
         charts_dir
     )
 
-    os.makedirs(charts_path, exist_ok=True)
+    os.makedirs(
+        charts_path,
+        exist_ok=True
+    )
+
+    # =====================================================
+    # CHARTS
+    # =====================================================
 
     generate_all_charts(
         results,
@@ -102,37 +156,70 @@ def generate_html_report(
     drs_chart = f"{charts_dir}/drs_chart.png"
     hallucination_chart = f"{charts_dir}/hallucination_chart.png"
 
+    # =====================================================
+    # RANKING
+    # =====================================================
+
     ranked = sorted(
         results.items(),
-        key=lambda x: x[1].get("drs_score", 0),
+        key=lambda x: x[1].get(
+            "drs_score",
+            0
+        ),
         reverse=True
     )
 
+    # =====================================================
+    # RECOMMENDED MODEL METRICS
+    # =====================================================
+
     recommended_model = recommendation.get(
         "recommended_model",
-        ""
+        "Unknown"
     )
 
-    recommended_metrics = {}
-
-    if recommended_model in results:
-        recommended_metrics = results[
-            recommended_model
-        ].get(
-            "metrics",
-            {}
-        )
+    recommended_metrics = results.get(
+        recommended_model,
+        {}
+    ).get(
+        "metrics",
+        {}
+    )
 
     recommended_factuality = recommended_metrics.get(
         "factuality",
         0
     )
 
+    performance_score = (
+        recommended_metrics.get("accuracy", 0)
+        +
+        recommended_metrics.get("semantic", 0)
+    ) / 2
+
+    trust_score = (
+        recommended_metrics.get("reliability", 0)
+        +
+        recommended_metrics.get("safety", 0)
+        +
+        recommended_metrics.get("factuality", 0)
+    ) / 3
+
+    # =====================================================
+    # TABLE ROWS
+    # =====================================================
+
     rows = ""
 
-    for i, (model, data) in enumerate(ranked, 1):
+    for i, (model, data) in enumerate(
+        ranked,
+        1
+    ):
 
-        m = data.get("metrics", {})
+        m = data.get(
+            "metrics",
+            {}
+        )
 
         hallucination = m.get(
             "hallucination",
@@ -197,24 +284,22 @@ def generate_html_report(
         </tr>
         """
 
-    risks_html = "".join(
-        [
-            f"<li>{r}</li>"
-            for r in recommendation.get(
-                "risks",
-                []
-            )
-        ]
+    # =====================================================
+    # HTML CONTENT BLOCKS
+    # =====================================================
+
+    risks_html = build_list_html(
+        recommendation.get(
+            "risks",
+            []
+        )
     )
 
-    insights_html = "".join(
-        [
-            f"<li>{i}</li>"
-            for i in recommendation.get(
-                "insights",
-                []
-            )
-        ]
+    insights_html = build_list_html(
+        recommendation.get(
+            "insights",
+            []
+        )
     )
 
     if recommended_model in results:
@@ -225,38 +310,32 @@ def generate_html_report(
             f"<b>{recommended_factuality:.3f}</b></li>"
         )
 
-    tradeoffs_detail_html = "".join(
-        [
-            f"<li>{t}</li>"
-            for t in recommendation.get(
-                "tradeoffs_detail",
-                []
-            )
-        ]
+    tradeoffs_detail_html = build_list_html(
+        recommendation.get(
+            "tradeoffs_detail",
+            []
+        )
     )
 
-    anomalies_html = "".join(
-        [
-            f"<li>{a}</li>"
-            for a in recommendation.get(
-                "anomalies",
-                []
-            )
-        ]
+    anomalies_html = build_list_html(
+        recommendation.get(
+            "anomalies",
+            []
+        )
     )
 
-    deployment_html = "".join(
-        [
-            f"<li>{d}</li>"
-            for d in deployment.get(
-                "recommendations",
-                []
-            )
-        ]
+    deployment_html = build_list_html(
+        deployment.get(
+            "recommendations",
+            []
+        )
     )
 
     trust = classify_trust(
-        recommendation.get("drs", 0)
+        recommendation.get(
+            "drs",
+            0
+        )
     )
 
     summary = recommendation.get(
@@ -264,11 +343,9 @@ def generate_html_report(
         f"""
         OpenVals recommends
         <b>{recommendation.get('recommended_model', 'Unknown')}</b>
-        based on overall trustworthiness,
-        factual accuracy, semantic quality,
-        operational reliability,
-        hallucination probability,
-        and deployment confidence.
+        based on overall trustworthiness, factual accuracy,
+        semantic quality, operational reliability,
+        hallucination probability, and deployment confidence.
         """
     )
 
@@ -276,174 +353,101 @@ def generate_html_report(
         "%Y-%m-%d %H:%M:%S"
     )
 
+    trust_dashboard_metrics = {
+        **recommended_metrics,
+        "drs": recommendation.get(
+            "drs",
+            0
+        )
+    }
+
+    # =====================================================
+    # HTML TEMPLATE
+    # =====================================================
+
     html = f"""
     <html>
+
     <head>
-        <title>OpenVals  AI Trust Evaluation Report</title>
-            {get_report_styles()}
+        <title>
+            OpenVals AI Trust Intelligence Report
+        </title>
+
+        {get_report_styles()}
     </head>
 
     <body>
+
         <div class="report-shell">
+
             {build_hero_section(
                 recommendation,
                 trust,
-                timestamp
+                timestamp,
+                dataset_name=dataset_name,
+                model_count=len(results),
+                config_name=config_name
             )}
-            <div class="card success">
-                <h2>Executive Summary</h2>
-                <p>{summary}</p>
 
-                <div class="trust">
-                    Trust Classification: {trust}
-                </div>
-            </div>
+            {build_executive_metric_cards(
+                performance_score,
+                trust_score
+            )}
 
-            <div class="card">
-                <h2>AI Advisor Recommendation</h2>
+            {build_executive_summary(
+                summary,
+                trust
+            )}
 
-                <p>
-                    <b>Recommended Model:</b>
-                    <span class="highlight">
-                        {recommendation.get('recommended_model', 'Unknown')}
-                    </span>
-                </p>
+            {build_ai_advisor_section(
+                recommendation,
+                recommended_factuality
+            )}
 
-                <div class="metric-box">
-                    <b>Score</b><br>
-                    {recommendation.get('score', 0)}
-                </div>
+            {build_trust_intelligence_dashboard(
+                trust_dashboard_metrics
+            )}
 
-                <div class="metric-box">
-                    <b>DRS</b><br>
-                    {recommendation.get('drs', 0)}
-                </div>
+            {build_visual_dashboard(
+                radar_chart,
+                latency_chart,
+                drs_chart,
+                hallucination_chart
+            )}
 
-                <div class="metric-box">
-                    <b>Confidence</b><br>
-                    {recommendation.get('confidence', 0)}
-                </div>
+            {build_deployment_section(
+                deployment.get(
+                    "readiness",
+                    "Unknown"
+                ),
+                deployment_html
+            )}
 
-                <div class="metric-box">
-                    <b>Factuality</b><br>
-                    {recommended_factuality:.3f}
-                </div>
+            {build_insights_section(
+                insights_html
+            )}
 
-                <hr>
+            {build_tradeoffs_section(
+                tradeoffs_detail_html
+            )}
 
-                <p>
-                    <b>Why Recommended:</b><br>
-                    {recommendation.get('reason', 'No reason provided')}
-                </p>
+            {build_risk_section(
+                risks_html,
+                anomalies_html
+            )}
 
-                <p>
-                    <b>Trade-offs:</b><br>
-                    {recommendation.get('tradeoffs', 'None')}
-                </p>
-            </div>
+            {build_leaderboard_section(
+                rows
+            )}
 
-            <div class="card">
-                <h2>Visual Intelligence Dashboard</h2>
+            {build_governance_section()}
 
-                <h3>Radar Analysis</h3>
-                <img src="{radar_chart}" class="chart" alt="Radar Chart">
+            {build_footer()}
 
-                <hr>
-
-                <h3>Latency Comparison</h3>
-                <img src="{latency_chart}" class="chart" alt="Latency Chart">
-
-                <hr>
-
-                <h3>DRS Comparison</h3>
-                <img src="{drs_chart}" class="chart" alt="DRS Chart">
-
-                <hr>
-
-                <h3>Hallucination Risk Comparison</h3>
-                <img
-                    src="{hallucination_chart}"
-                    class="chart"
-                    alt="Hallucination Chart"
-                >
-            </div>
-
-            <div class="card">
-                <h2>Deployment Readiness</h2>
-
-                <div class="deployment">
-                    {deployment.get("readiness", "Unknown")}
-                </div>
-
-                <ul>
-                    {deployment_html}
-                </ul>
-            </div>
-
-            <div class="card info">
-                <h2>Operational Insights</h2>
-
-                <ul>
-                    {insights_html}
-                </ul>
-            </div>
-
-            <div class="card">
-                <h2>Tradeoff Analysis</h2>
-
-                <ul>
-                    {tradeoffs_detail_html}
-                </ul>
-            </div>
-
-            <div class="card warning">
-                <h2>Risk Analysis</h2>
-
-                <ul>
-                    {risks_html}
-                </ul>
-            </div>
-
-            <div class="card warning">
-                <h2>Detected Anomalies</h2>
-
-                <ul>
-                    {anomalies_html}
-                </ul>
-            </div>
-
-            <div class="card">
-                <h2>Model Leaderboard</h2>
-
-                <table>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Model</th>
-                        <th>Accuracy</th>
-                        <th>Semantic</th>
-                        <th>Factuality</th>
-                        <th>Reliability</th>
-                        <th>Safety</th>
-                        <th>Consistency</th>
-                        <th>Variance</th>
-                        <th>Hallucination</th>
-                        <th>Latency(ms)</th>
-                        <th>DRS</th>
-                    </tr>
-
-                    {rows}
-                </table>
-            </div>
-
-                <div class="footer">
-                    Built with OpenVals •
-                    AI Trust & Validation Platform
-
-                <br><br>
-                Developed by DrPinnacle
-            </div>
         </div>
+
     </body>
+
     </html>
     """
 
@@ -455,5 +459,5 @@ def generate_html_report(
         f.write(html)
 
     print(
-        f"✅ Report generated: {output_file}"
+        f"✅ HTML report generated: {output_file}"
     )

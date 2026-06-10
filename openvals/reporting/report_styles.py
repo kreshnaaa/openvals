@@ -44,7 +44,7 @@ def get_report_styles():
         }
 
         .report-shell {
-            max-width: 1280px;
+            max-width: 1440px;
             margin: 0 auto;
         }
 
@@ -58,9 +58,12 @@ def get_report_styles():
                 );
             color: white;
             border-radius: 28px;
-            padding: 34px;
-            margin-bottom: 28px;
-            box-shadow: 0 24px 60px rgba(15,23,42,0.28);
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 24px 50px rgba(15,23,42,0.28);
+        }
+        .hero + .grid {
+            margin-top: 28px;
         }
 
         .hero-top {
@@ -161,7 +164,8 @@ def get_report_styles():
 
         .grid {
             display: grid;
-            gap: 18px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .grid-4 {
@@ -178,10 +182,10 @@ def get_report_styles():
 
         .card {
             background: rgba(255,255,255,0.96);
-            padding: 24px;
-            margin-bottom: 22px;
+            padding: 22px;
+            margin-bottom: 20px;
             border-radius: 22px;
-            box-shadow: 0 12px 32px rgba(15,23,42,0.08);
+            box-shadow: 0 10px 28px rgba(15,23,42,0.08);
             border: 1px solid rgba(226,232,240,0.9);
         }
 
@@ -207,8 +211,9 @@ def get_report_styles():
                 );
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+            padding: 18px;
+            min-height: 132px;
+            box-shadow: 0 8px 20px rgba(15,23,42,0.05);
         }
 
         .metric-label {
@@ -220,8 +225,8 @@ def get_report_styles():
         }
 
         .metric-value {
-            margin-top: 10px;
-            font-size: 32px;
+            margin-top: 8px;
+            font-size: 28px;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: -0.04em;
