@@ -23,6 +23,12 @@ from openvals.datasets.registry import (
 from openvals.config.loader import (
     load_config
 )
+from openvals.advisor.recommendation_engine import (
+    recommend_models
+)
+from openvals.advisor.usecase_loader import load_use_case_from_file
+from openvals.advisor.usecase_analyzer import analyze_use_case_text
+from openvals.advisor.trust_profile import build_trust_profile
 
 from openvals.models.ollama_model import (
     OllamaModel
@@ -241,27 +247,21 @@ def benchmark(
         typer.echo(
             "Debug mode enabled\n"
         )
-
     # =====================================================
     # RUN BENCHMARK
     # =====================================================
-
     runner = BenchmarkRunner(
-
         models=loaded_models,
         dataset=dataset_data,
         weights=weights,
         debug=debug,
         parallel=parallel,
         max_workers=max_workers
-
     )
-
     results = runner.run()
     # =====================================================
     # DRS RANKING
     # =====================================================
-
     ranking = sorted(
 
         [
@@ -285,14 +285,11 @@ def benchmark(
     # =====================================================
     # FINAL TABLE
     # =====================================================
-
     typer.echo(
 
         "\n=== MODEL BENCHMARK "
         "(DRS Ranked) ===\n"
-
     )
-
     print(
 
         f"{'Rank':<5} "
@@ -594,6 +591,338 @@ def validate_dataset_cli(
 
         typer.echo(
             f"\n❌ Dataset validation failed: {str(e)}"
+        )
+
+        raise typer.Exit(code=1)
+
+@app.command("trust-advisor")
+def trust_advisor_cli(
+
+    problem: str = typer.Option(
+        None,
+        "--problem",
+        help="Problem statement or AI use case"
+    ),
+
+    file: str = typer.Option(
+        None,
+        "--file",
+        help="Path to a text or JSON file describing the use case"
+    ),
+
+    top_k: int = typer.Option(
+        3,
+        "--top-k",
+        help="Number of model recommendations"
+    )
+
+):
+
+    """
+    Generate a trust advisory profile for an AI use case.
+    """
+
+    try:
+
+        if file:
+
+            problem_text = load_use_case_from_file(
+                file
+            )
+
+        elif problem:
+
+            problem_text = problem
+
+        else:
+
+            typer.echo(
+                "\n❌ Please provide --problem or --file"
+            )
+
+            raise typer.Exit(code=1)
+
+        profile = build_trust_profile(
+            problem_text,
+            top_k=top_k
+        )
+
+        typer.echo(
+            "\n🛡️ OpenVals Trust Advisor\n"
+        )
+
+        typer.echo(
+            f"Use Case           : "
+            f"{profile['use_case']}"
+        )
+
+        typer.echo(
+            f"Confidence         : "
+            f"{profile['use_case_confidence']}"
+        )
+
+        typer.echo(
+            f"Risk Level         : "
+            f"{profile['risk_level']}"
+        )
+
+        typer.echo(
+            f"Risk Reason        : "
+            f"{profile['risk_reason']}"
+        )
+
+        typer.echo(
+            f"Data Sensitivity   : "
+            f"{profile['data_sensitivity']}"
+        )
+
+        typer.echo(
+            f"Recommended Dataset: "
+            f"{profile['recommended_dataset']}"
+        )
+
+        typer.echo(
+            f"Recommended Config : "
+            f"{profile['recommended_config']}"
+        )
+
+        typer.echo(
+            f"Trust Status       : "
+            f"{profile['trust_status']}"
+        )
+
+        typer.echo(
+            "\nRecommended Metrics:"
+        )
+
+        for metric in profile[
+            "recommended_metrics"
+        ]:
+
+            typer.echo(
+                f"→ {metric}"
+            )
+
+        typer.echo(
+            "\nRecommended Models:"
+        )
+
+        for idx, model in enumerate(
+            profile["recommended_models"],
+            start=1
+        ):
+
+            typer.echo(
+                f"{idx}. {model['model']} "
+                f"(MFS: {model['score']})"
+            )
+
+            typer.echo(
+                f"   Why: {model['reason']}"
+            )
+
+        typer.echo(
+            "\nValidation Strategy:"
+        )
+
+        for item in profile[
+            "validation_strategy"
+        ]:
+
+            typer.echo(
+                f"→ {item}"
+            )
+
+    except Exception as e:
+
+        typer.echo(
+            f"\n❌ Trust advisory failed: {str(e)}"
+        )
+
+        raise typer.Exit(code=1)
+    
+@app.command("recommend-model")
+def recommend_model_cli(
+    use_case: str = typer.Option(
+        None,
+        "--use-case",
+        help="Use case profile, e.g. finance, cybersecurity, coding"
+    ),
+    problem: str = typer.Option(
+        None,
+        "--problem",
+        help="Problem statement for the use case"
+    ),
+    file: str = typer.Option(
+        None,
+        "--file",
+        help="Path to a text or JSON file describing the use case"
+    ),
+
+    top_k: int = typer.Option(
+        3,
+        "--top-k",
+        help="Number of model recommendations"
+    ),
+
+    private_required: bool = typer.Option(
+        False,
+        "--private-required",
+        help="Only recommend private-ready models"
+    ),
+
+    enterprise_required: bool = typer.Option(
+        False,
+        "--enterprise-required",
+        help="Only recommend enterprise-ready models"
+    )
+
+):
+
+    """
+    Recommend the best model for a given use case.
+    """
+
+    try:
+
+        # =================================================
+        # LOAD PROBLEM STATEMENT OR FILE
+        # =================================================
+
+        use_case_text = ""
+
+        if file:
+
+            use_case_text = load_use_case_from_file(
+                file
+            )
+
+        elif problem:
+
+            use_case_text = problem
+
+        # =================================================
+        # AUTO-INFER USE CASE
+        # =================================================
+
+        if not use_case and use_case_text:
+
+            analysis = analyze_use_case_text(
+                use_case_text
+            )
+
+            use_case = analysis[
+                "use_case"
+            ]
+
+            typer.echo(
+                f"\n🧠 Inferred Use Case: "
+                f"{use_case}"
+            )
+
+            typer.echo(
+                f"Confidence: "
+                f"{analysis['confidence']}"
+            )
+
+            typer.echo(
+                f"Reason: "
+                f"{analysis['reason']}\n"
+            )
+
+        # =================================================
+        # VALIDATION
+        # =================================================
+
+        if not use_case:
+
+            typer.echo(
+                "\n❌ Please provide "
+                "--use-case, --problem, or --file"
+            )
+
+            raise typer.Exit(code=1)
+
+        # =================================================
+        # RECOMMEND MODELS
+        # =================================================
+
+        result = recommend_models(
+            use_case=use_case,
+            top_k=top_k,
+            private_required=private_required,
+            enterprise_required=enterprise_required
+        )
+
+        typer.echo(
+            f"\n🧭 OpenVals Model Advisor"
+        )
+
+        typer.echo(
+            f"Use Case: {result['use_case']}"
+        )
+
+        typer.echo(
+            f"Description: {result['description']}\n"
+        )
+
+        # =================================================
+        # OPTIONAL ORIGINAL PROBLEM CONTEXT
+        # =================================================
+
+        if use_case_text:
+
+            typer.echo(
+                "Problem Context:"
+            )
+
+            typer.echo(
+                f"{use_case_text}\n"
+            )
+
+        # =================================================
+        # PRINT RECOMMENDATIONS
+        # =================================================
+
+        for idx, rec in enumerate(
+            result["recommendations"],
+            start=1
+        ):
+
+            typer.echo(
+                f"{idx}. {rec['model']} "
+                f"(MFS: {rec['score']})"
+            )
+
+            typer.echo(
+                f"   Provider: {rec['provider']}"
+            )
+
+            typer.echo(
+                f"   Type: {rec['model_type']}"
+            )
+
+            typer.echo(
+                f"   Private Ready: {rec['private_ready']}"
+            )
+
+            typer.echo(
+                f"   Enterprise Ready: {rec['enterprise_ready']}"
+            )
+
+            typer.echo(
+                f"   Strengths: "
+                f"{', '.join(rec['strengths'])}"
+            )
+
+            typer.echo(
+                f"   Why: {rec['reason']}\n"
+            )
+
+    except Exception as e:
+
+        typer.echo(
+            f"\n❌ Model recommendation failed: {str(e)}"
         )
 
         raise typer.Exit(code=1)
