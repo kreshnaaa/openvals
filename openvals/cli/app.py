@@ -1,3 +1,5 @@
+import profile
+
 import typer
 from pathlib import Path
 
@@ -15,6 +17,8 @@ from openvals.datasets.validators.dataset_validator import (
     validate_dataset_object,
     print_validation_report
 )
+
+from openvals.advisor.trust_readiness import compute_trust_readiness
 
 from openvals.datasets.registry import (
     DATASETS
@@ -647,6 +651,10 @@ def trust_advisor_cli(
             top_k=top_k
         )
 
+        tri = compute_trust_readiness(
+            profile
+        )
+
         typer.echo(
             "\n🛡️ OpenVals Trust Advisor\n"
         )
@@ -692,6 +700,16 @@ def trust_advisor_cli(
         )
 
         typer.echo(
+            f"TRI Score          : "
+            f"{tri['tri_score']}/100"
+        )
+
+        typer.echo(
+            f"Readiness          : "
+            f"{tri['readiness']}"
+        )
+
+        typer.echo(
             "\nRecommended Metrics:"
         )
 
@@ -727,6 +745,18 @@ def trust_advisor_cli(
 
         for item in profile[
             "validation_strategy"
+        ]:
+
+            typer.echo(
+                f"→ {item}"
+            )
+
+        typer.echo(
+            "\nTRI Deductions:"
+        )
+
+        for item in tri[
+            "deductions"
         ]:
 
             typer.echo(
