@@ -49,7 +49,8 @@ def run_trust_workflow(
     parallel=True,
     max_workers=2,
     debug=False,
-    auto_pull=False
+    auto_pull=False,
+    quick=False
 ):
 
     # =====================================================
@@ -95,10 +96,14 @@ def run_trust_workflow(
             []
         )
     ]
+    if quick:
 
-    print(
-        "\n🧠 Models recommended for benchmarking:"
-    )
+        model_names = model_names[:2]
+
+        print("\n⚡ QUICK MODE ENABLED")
+        print("Using top 2 recommended models")
+
+    print("\n Models recommended for benchmarking:")
 
     for model_name in model_names:
         print(
@@ -108,9 +113,7 @@ def run_trust_workflow(
     loaded_models = {}
     skipped_models = []
 
-    print(
-        "\n🔍 Checking recommended model availability..."
-    )
+    print("\nChecking recommended model availability...")
 
     for model_name in model_names:
 
@@ -177,6 +180,9 @@ def run_trust_workflow(
     dataset_data = load_builtin_dataset(
         selected_dataset
     )
+    if quick:
+        dataset_data = dataset_data[:3]
+        print(f"Using {len(dataset_data)} samples")
 
     # =====================================================
     # LOAD WEIGHTS

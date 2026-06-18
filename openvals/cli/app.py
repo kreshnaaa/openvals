@@ -619,6 +619,11 @@ def trust_advisor_cli(
         "--benchmark",
         help="Run benchmark for recommended models"
     ),
+    quick: bool = typer.Option(
+        False,
+        "--quick",
+        help="Run a fast benchmark using fewer models and samples"
+    ),
 
     file: str = typer.Option(
         None,
@@ -664,7 +669,10 @@ def trust_advisor_cli(
                 problem_text=problem_text,
                 top_k=top_k,
                 parallel=True,
-                max_workers=2
+                max_workers=max(2, top_k),
+                debug=False,
+                auto_pull=True,
+                quick=quick
             )
 
             profile = workflow["profile"]
