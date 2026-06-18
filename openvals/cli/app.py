@@ -19,6 +19,9 @@ from openvals.datasets.validators.dataset_validator import (
 )
 
 from openvals.advisor.trust_readiness import compute_trust_readiness
+from openvals.advisor.trust_workflow import (
+    run_trust_workflow
+)
 
 from openvals.datasets.registry import (
     DATASETS
@@ -608,6 +611,12 @@ def trust_advisor_cli(
         help="Problem statement or AI use case"
     ),
 
+    benchmark: bool = typer.Option(
+        False,
+        "--benchmark",
+        help="Run benchmark for recommended models"
+    ),
+
     file: str = typer.Option(
         None,
         "--file",
@@ -645,6 +654,43 @@ def trust_advisor_cli(
             )
 
             raise typer.Exit(code=1)
+        
+        if benchmark:
+
+            workflow = run_trust_workflow(
+                problem_text=problem_text,
+                top_k=top_k,
+                parallel=True,
+                max_workers=2
+            )
+
+            profile = workflow["profile"]
+            tri = workflow["tri"]
+            verdict = workflow["trust_verdict"]
+
+            typer.echo("\n🛡️ OpenVals Trust Advisor\n")
+
+            typer.echo(f"Use Case           : {profile['use_case']}")
+            typer.echo(f"Risk Level         : {profile['risk_level']}")
+            typer.echo(f"Data Sensitivity   : {profile['data_sensitivity']}")
+            typer.echo(f"Dataset            : {workflow['dataset']}")
+            typer.echo(f"Config             : {workflow['config']}")
+            typer.echo(f"TRI Score          : {tri['tri_score']}/100")
+            typer.echo(f"Readiness          : {tri['readiness']}")
+
+            typer.echo("\nBenchmark Result:")
+            typer.echo(f"Best Model         : {workflow['best_model']}")
+            typer.echo(f"Best DRS           : {workflow['best_drs']}")
+
+            typer.echo("\nFinal Trust Verdict:")
+            typer.echo(f"Verdict            : {verdict['verdict']}")
+            typer.echo(f"Recommendation     : {verdict['recommendation']}")
+
+            typer.echo("\nRequired Controls:")
+            for control in verdict["required_controls"]:
+                typer.echo(f"→ {control}")
+
+            return
 
         profile = build_trust_profile(
             problem_text,
