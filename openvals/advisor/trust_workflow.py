@@ -40,7 +40,7 @@ from openvals.models.availability import (
 # =========================================================
 # TRUST WORKFLOW
 # =========================================================
-print("\n🚀 TRUST WORKFLOW STARTED\n") #remove this after debugging
+print("\n ====>TRUST WORKFLOW STARTED<====\n") #remove this after debugging
 def run_trust_workflow(
     problem_text,
     top_k=3,
@@ -84,12 +84,7 @@ def run_trust_workflow(
     selected_config = config or profile.get(
         "recommended_config"
     )
-
-    # =====================================================
-    # MODELS
-    # =====================================================
-
-   # =====================================================
+# =====================================================
 # MODELS
 # =====================================================
 
@@ -186,16 +181,27 @@ def run_trust_workflow(
     # =====================================================
     # LOAD WEIGHTS
     # =====================================================
+    try:
 
-    if selected_config:
+        if selected_config:
 
-        cfg = load_config(
-            selected_config
-        )
+            cfg = load_config(
+                selected_config
+            )
 
-        weights = cfg["weights"]
+            weights = cfg["weights"]
 
-    else:
+        else:
+
+            metadata = load_dataset_metadata(
+                selected_dataset
+            )
+
+            weights = metadata[
+                "recommended_weights"
+            ]
+
+    except Exception:
 
         metadata = load_dataset_metadata(
             selected_dataset
@@ -204,6 +210,8 @@ def run_trust_workflow(
         weights = metadata[
             "recommended_weights"
         ]
+
+        selected_config = "metadata_default"
 
     # =====================================================
     # RUN BENCHMARK
