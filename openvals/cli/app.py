@@ -22,6 +22,9 @@ from openvals.advisor.trust_readiness import compute_trust_readiness
 from openvals.advisor.trust_workflow import (
     run_trust_workflow
 )
+from openvals.advisor.model_catalog import (
+    get_model_catalog
+)
 
 from openvals.datasets.registry import (
     DATASETS
@@ -1002,6 +1005,55 @@ def recommend_model_cli(
         )
 
         raise typer.Exit(code=1)
+    
+# =========================================================
+# MODELS
+# =========================================================
+
+@app.command("models")
+def models_cli(
+
+    installed_only: bool = typer.Option(
+        True,
+        "--installed-only/--all",
+        help="Show installed Ollama models or all known catalog models"
+    )
+
+):
+
+    """
+    List models discovered by OpenVals.
+    """
+
+    catalog = get_model_catalog(
+        installed_only=installed_only
+    )
+
+    typer.echo(
+        "\n🤖 OpenVals Model Catalog\n"
+    )
+
+    print(
+        f"{'Model':<25} "
+        f"{'Provider':<12} "
+        f"{'Type':<10} "
+        f"{'Private':<10} "
+        f"{'Enterprise':<12} "
+        f"{'Dynamic':<10}"
+    )
+
+    print("-" * 90)
+
+    for model_name, profile in catalog.items():
+
+        print(
+            f"{model_name:<25} "
+            f"{profile.get('provider', 'unknown'):<12} "
+            f"{profile.get('model_type', 'unknown'):<10} "
+            f"{str(profile.get('private_ready', False)):<10} "
+            f"{str(profile.get('enterprise_ready', False)):<12} "
+            f"{str(profile.get('dynamic', False)):<10}"
+        )    
 # =========================================================
 # DATASETS
 # =========================================================

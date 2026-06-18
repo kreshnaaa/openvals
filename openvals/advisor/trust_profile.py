@@ -299,8 +299,6 @@ def build_trust_profile(
         "validation_strategy": validation_strategy,
         "trust_status": trust_status
     }
-
-
 # =========================================================
 # VALIDATION STRATEGY
 # =========================================================

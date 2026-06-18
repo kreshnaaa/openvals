@@ -1,3 +1,5 @@
+import profile
+
 from openvals.advisor.trust_profile import (
     build_trust_profile
 )
@@ -30,11 +32,15 @@ from openvals.benchmarking.benchmark import (
     BenchmarkRunner
 )
 
+from openvals.models.availability import (
+    is_ollama_model_available,
+    pull_ollama_model
+)
 
 # =========================================================
 # TRUST WORKFLOW
 # =========================================================
-
+print("\n🚀 TRUST WORKFLOW STARTED\n") #remove this after debugging
 def run_trust_workflow(
     problem_text,
     top_k=3,
@@ -42,7 +48,8 @@ def run_trust_workflow(
     config=None,
     parallel=True,
     max_workers=2,
-    debug=False
+    debug=False,
+    auto_pull=False
 ):
 
     # =====================================================
@@ -53,6 +60,10 @@ def run_trust_workflow(
         problem_text,
         top_k=top_k
     )
+    print("\n===== TRUST PROFILE =====")
+    for model in profile["recommended_models"]:
+        print(f"Recommended: {model['model']}")
+    print("=========================\n")
 
     # =====================================================
     # TRI
@@ -78,6 +89,10 @@ def run_trust_workflow(
     # MODELS
     # =====================================================
 
+   # =====================================================
+# MODELS
+# =====================================================
+
     model_names = [
         model["model"]
         for model in profile.get(
@@ -86,9 +101,41 @@ def run_trust_workflow(
         )
     ]
 
-    loaded_models = {}
+    print(
+        "\n🧠 Models recommended for benchmarking:"
+    )
 
     for model_name in model_names:
+        print(
+            f"→ {model_name}"
+        )
+
+    loaded_models = {}
+    skipped_models = []
+
+    print(
+        "\n🔍 Checking recommended model availability..."
+    )
+
+    for model_name in model_names:
+
+        print(
+            f"🔎 Checking model: {model_name}"
+        )
+
+        if not is_ollama_model_available(
+            model_name
+        ):
+
+            print(
+                f"⚠ Skipping unavailable model: {model_name}"
+            )
+
+            skipped_models.append(
+                model_name
+            )
+
+            continue
 
         try:
 
@@ -98,9 +145,19 @@ def run_trust_workflow(
                 model_name
             )
 
-        except Exception:
+            print(
+                f"✅ Loaded recommended model: {model_name}"
+            )
 
-            continue
+        except Exception as e:
+
+            print(
+                f"⚠ Failed to load model {model_name}: {str(e)}"
+            )
+
+            skipped_models.append(
+                model_name
+            )
 
     if not loaded_models:
 
@@ -209,5 +266,6 @@ def run_trust_workflow(
         "best_drs": best_drs,
         "trust_verdict": trust_verdict,
         "dataset": selected_dataset,
+        "skipped_models": skipped_models,
         "config": selected_config
     }
