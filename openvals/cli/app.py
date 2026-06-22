@@ -62,6 +62,9 @@ from openvals.reporting.sample_report import (
 from openvals.utils.paths import (
     create_output_structure
 )
+from openvals.explainability.trust_explain import (
+    print_trust_workflow_explanation
+)
 
 # =========================================================
 # TYPER APP
@@ -607,7 +610,6 @@ def validate_dataset_cli(
 
 @app.command("trust-advisor")
 def trust_advisor_cli(
-
     problem: str = typer.Option(
         None,
         "--problem",
@@ -619,10 +621,17 @@ def trust_advisor_cli(
         "--benchmark",
         help="Run benchmark for recommended models"
     ),
-    quick: bool = typer.Option(
+
+    explain: bool = typer.Option(
         False,
-        "--quick",
-        help="Run a fast benchmark using fewer models and samples"
+        "--explain",
+        help="Show detailed explanation of trust workflow results"
+    ),
+
+    mode: str = typer.Option(
+        "standard",
+        "--mode",
+        help="Benchmark mode: quick, standard, full"
     ),
 
     file: str = typer.Option(
@@ -635,51 +644,55 @@ def trust_advisor_cli(
         3,
         "--top-k",
         help="Number of model recommendations"
+    ),
+
+    max_workers: int = typer.Option(
+        None,
+        "--max-workers",
+        help="Max workers for parallel benchmarking (overrides auto-recommendation)"
     )
 
 ):
-
     """
     Generate a trust advisory profile for an AI use case.
     """
-
     try:
-
         if file:
-
             problem_text = load_use_case_from_file(
                 file
             )
-
         elif problem:
-
             problem_text = problem
-
         else:
-
             typer.echo(
                 "\n❌ Please provide --problem or --file"
             )
-
             raise typer.Exit(code=1)
-        
+        valid_modes = ["quick", "standard", "full"]
+        if mode not in valid_modes:
+            typer.echo(
+                f"\n❌ Invalid mode: {mode}. "
+                f"Choose from: {', '.join(valid_modes)}"
+            )
+            raise typer.Exit(code=1)
         if benchmark:
-
             workflow = run_trust_workflow(
                 problem_text=problem_text,
                 top_k=top_k,
                 parallel=True,
-                max_workers=max(2, top_k),
-                debug=False,
-                auto_pull=True,
-                quick=quick
+                max_workers=max_workers,
+                mode=mode,
+                explain=explain
             )
+            if explain:
+                print_trust_workflow_explanation(workflow)
+                return
 
             profile = workflow["profile"]
             tri = workflow["tri"]
             verdict = workflow["trust_verdict"]
 
-            typer.echo("\n🛡️ OpenVals Trust Advisor\n")
+            typer.echo("\n===> OpenVals Trust Advisor <====\n")
 
             typer.echo(f"Use Case           : {profile['use_case']}")
             typer.echo(f"Risk Level         : {profile['risk_level']}")
@@ -711,6 +724,8 @@ def trust_advisor_cli(
         tri = compute_trust_readiness(
             profile
         )
+
+
 
         typer.echo(
             "\n🛡️ OpenVals Trust Advisor\n"
@@ -845,7 +860,6 @@ def recommend_model_cli(
         "--file",
         help="Path to a text or JSON file describing the use case"
     ),
-
     top_k: int = typer.Option(
         3,
         "--top-k",
@@ -869,23 +883,17 @@ def recommend_model_cli(
     """
     Recommend the best model for a given use case.
     """
-
     try:
 
         # =================================================
         # LOAD PROBLEM STATEMENT OR FILE
         # =================================================
-
         use_case_text = ""
-
         if file:
-
             use_case_text = load_use_case_from_file(
                 file
             )
-
         elif problem:
-
             use_case_text = problem
 
         # =================================================

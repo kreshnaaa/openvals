@@ -12,7 +12,8 @@ class BenchmarkRunner:
         weights=None,
         debug=False,
         parallel=False,
-        max_workers=3
+        max_workers=3,
+        verbose=True
     ):
         self.models = models
         self.dataset = dataset
@@ -20,16 +21,14 @@ class BenchmarkRunner:
         self.debug = debug
         self.parallel = parallel
         self.max_workers = max_workers
+        self.verbose = verbose
 
     def run(self):
         if self.parallel:
             return self._run_parallel()
-
         return self._run_sequential()
-
     def _run_sequential(self):
         results = {}
-
         for name, model in self.models.items():
             results[name] = self._run_single_model(
                 name,
@@ -37,19 +36,15 @@ class BenchmarkRunner:
             )
 
         return results
-
     def _run_parallel(self):
         results = {}
-
         workers = min(
             self.max_workers,
             len(self.models)
         )
-
         with ThreadPoolExecutor(
             max_workers=workers
         ) as executor:
-
             futures = {
                 executor.submit(
                     self._run_single_model,
@@ -58,26 +53,22 @@ class BenchmarkRunner:
                 ): name
                 for name, model in self.models.items()
             }
-
             for future in as_completed(futures):
                 name = futures[future]
-
                 try:
                     results[name] = future.result()
-
                 except Exception as e:
                     print(
                         f"🔥 CRITICAL ERROR in model "
                         f"{name}: {str(e)}"
                     )
-
                     results[name] = self._empty_result()
 
         return results
 
     def _run_single_model(self, name, model):
-        print(f"\n🚀 Running model: {name}")
-
+        if self.verbose:
+            print(f"\n🚀 Running model: {name}")
         try:
             evaluator = Evaluator(
                 model=model,
