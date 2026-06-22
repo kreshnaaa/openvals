@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvals"
-version = "0.5.127535"
+version = "0.5.0"
 
 description = "Open source AI evaluation, validation, benchmarking, recommendation engine and trust layer for LLMs"
 

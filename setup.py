@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="openvals",
-    version="0.5.127535",
+    version="0.5.0",
     author="Vishwanath Akuthota",
     description=(
 
