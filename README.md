@@ -8,7 +8,25 @@ OpenVals is an enterprise-grade AI evaluation and trust platform designed to hel
 
 Unlike traditional AI benchmarks that focus only on accuracy, OpenVals evaluates performance, trustworthiness, factuality, reliability, safety, hallucination risk, governance readiness, and deployment confidence.
 
+# OpenVals
+
+[![PyPI Version](https://img.shields.io/pypi/v/openvals)](https://pypi.org/project/openvals/)
+[![Python](https://img.shields.io/pypi/pyversions/openvals)](https://pypi.org/project/openvals/)
+[![License](https://img.shields.io/badge/license-DPCL--CE-blue)](LICENSE)
+[![Downloads](https://img.shields.io/pypi/dm/openvals)](https://pypi.org/project/openvals/)
+[![GitHub Stars](https://img.shields.io/github/stars/vishwanathakuthota/openvals)](https://github.com/vishwanathakuthota/openvals)
+
+> Trust Infrastructure for AI
+
 ---
+
+## What is OpenVals?
+
+OpenVals is an AI Trust Intelligence Platform that helps enterprises evaluate, validate, benchmark, and govern AI systems before production deployment.
+
+OpenVals answers one question:
+
+**Can you trust your AI?**
 
 ## Why OpenVals?
 
@@ -24,8 +42,48 @@ Production environments require something different:
 - Is the model ready for enterprise deployment?
 
 OpenVals was built to answer these questions.
+## Why OpenVals?
+
+| Capability | Traditional Benchmarking | OpenVals |
+|------------|------------|------------|
+| Accuracy | ✓ | ✓ |
+| Latency | ✓ | ✓ |
+| Semantic Similarity | ✓ | ✓ |
+| Hallucination Detection | Limited | ✓ |
+| Factuality Analysis | Limited | ✓ |
+| Trust Scoring | ✗ | ✓ |
+| Governance Readiness | ✗ | ✓ |
+| Executive Reporting | ✗ | ✓ |
+| Enterprise Validation | ✗ | ✓ |
 
 ---
+
+## Enterprise Use Cases
+
+### AI Model Selection
+
+Compare GPT, Claude, Llama, Mistral, and private models before deployment.
+
+### Private AI Validation
+
+Validate enterprise AI running on Ollama, vLLM, or self-hosted infrastructure.
+
+### AI Procurement
+
+Benchmark vendor AI solutions before purchasing decisions.
+
+### AI Governance
+
+Measure AI readiness against organizational trust and governance requirements.
+
+### AI Red Teaming Foundation
+
+Identify hallucination risk, factual weaknesses, and trust gaps.
+
+### Executive Reporting
+
+Generate trust dashboards and executive-level AI readiness reports.
+
 
 ## Core Platform Capabilities
 
@@ -117,7 +175,33 @@ Dataset Validation CLI includes:
 - Missing field detection
 - Dataset Health Score (DHS)
 
-Examples:
+## 60-Second Quick Start
+
+Install:
+
+```bash
+pip install openvals
+```
+
+Benchmark:
+
+```bash
+openvals benchmark \
+  --dataset finance \
+  --models mistral,llama3
+```
+
+Output:
+
+```text
+Model      Accuracy    DRS
+--------------------------------
+llama3     91.4        89.2
+mistral    87.8        82.4
+QWEN       70.7        69.7
+```
+
+### validate-dataset examples
 
 ```bash
 openvals validate-dataset finance
@@ -131,7 +215,82 @@ openvals validate-dataset ./customer_dataset.json
 openvals validate-dataset ./customer_dataset.csv
 ```
 
+```bash
+openvals validate-dataset finance
+```
+
+### Benchmark multiple models:
+
+```bash
+openvals benchmark \
+  --dataset finance \
+  --models mistral,llama3 \
+  --config finance
+```
+### Parallel Execution Engine
+
+OpenVals supports parallel model execution for faster benchmarking.
+
+```bash
+openvals benchmark \
+  --dataset finance \
+  --models mistral,llama3 \
+  --parallel \
+  --max-workers 2
+```
+
+Benefits:
+
+- Reduced benchmark runtime
+- Better scalability
+- Future SaaS readiness
+
+
+Show version:
+
+```bash
+openvals version
+```
 ---
+
+## Example Output
+
+```text
+===================================================
+OpenVals Trust Intelligence Report
+===================================================
+
+Model: llama3
+
+Accuracy Score      : 91.4
+Semantic Score      : 89.1
+Factuality Score    : 92.3
+Safety Score        : 95.2
+Latency Score       : 83.0
+
+Hallucination Risk  : LOW
+
+Decision Reliability Score (DRS)
+
+89.2 / 100
+
+Deployment Status:
+
+READY FOR PRODUCTION
+```
+## Screenshots
+
+### Trust Dashboard
+
+<img src="./docs/images/dashboard.png">
+
+### Sample Evaluation Report
+
+<img src="./docs/images/sample-report.html">
+
+### Dataset Validation
+
+<img src="./docs/images/dataset-validation.png">
 
 ### Multi-Model Benchmarking
 
@@ -154,65 +313,6 @@ Capabilities:
 
 ---
 
-### Parallel Execution Engine
-
-OpenVals supports parallel model execution for faster benchmarking.
-
-```bash
-openvals benchmark \
-  --dataset finance \
-  --models mistral,llama3 \
-  --parallel \
-  --max-workers 2
-```
-
-Benefits:
-
-- Reduced benchmark runtime
-- Better scalability
-- Future SaaS readiness
-
----
-
-### Executive Reporting
-
-OpenVals generates executive-grade reports:
-
-#### Dashboard Report
-
-```text
-report.html
-```
-
-Includes:
-
-- Trust Dashboard
-- DRS Ranking
-- Operational Insights
-- Governance Readiness
-- Risk Analysis
-- Visual Analytics
-
-#### Sample-Level Evaluation Report
-
-```text
-sample_report.html
-```
-
-Includes:
-
-- Prompt
-- Expected Output
-- Model Output
-- Accuracy
-- Semantic
-- Factuality
-- Hallucination Risk
-- Safety
-- Latency
-
----
-
 ## Supported Benchmark Domains
 
 Current datasets:
@@ -220,112 +320,56 @@ Current datasets:
 - Finance
 - Healthcare
 - Cybersecurity
-
-Future:
-
 - Legal
-- Insurance
-- Manufacturing
-- Retail
+- Insurance(coming soon)
+- Manufacturing(coming soon)
+- Retail(coming soon)
 - Enterprise Operations
 - Software Engineering
-
----
-
-## Installation
-
-```bash
-pip install openvals
-```
-
----
-
-## Quick Start
-
-Benchmark multiple models:
-
-```bash
-openvals benchmark \
-  --dataset finance \
-  --models mistral,llama3 \
-  --config finance
-```
-
-Validate a dataset:
-
-```bash
-openvals validate-dataset finance
-```
-
-List available datasets:
-
-```bash
-openvals datasets
-```
-
-Show version:
-
-```bash
-openvals version
-```
+- Math
+- Reasoning
 
 ---
 
 ## OpenVals Architecture
 
-```text
-Dataset
-   ↓
-
+Enterprise Dataset
+        ↓
 Dataset Validation
-   ↓
-
-Evaluation Engine
-   ↓
-
-Trust Intelligence
-   ↓
-
-DRS
-   ↓
-
-Recommendation Engine
-   ↓
-
+        ↓
+AI Evaluation Engine
+        ↓
+Trust Intelligence Layer
+        ↓
+Factuality Engine
+        ↓
+Hallucination Detection
+        ↓
+Decision Reliability Score
+        ↓
 Executive Reporting
-```
 
 ---
 
-## Roadmap
+## OpenVals Ecosystem
 
-### v0.4.0
+OpenVals is part of a larger AI Trust & Assurance ecosystem.
 
-- Parallel Model Execution
-- Reporting Refactor
-- Sample-Level Drilldown
-- Dataset Validation CLI
-- Judge Layer Foundation
+### OpenVals
 
-### v0.5.0
+AI Validation & Trust Intelligence
 
-- LLM-as-a-Judge
-- Trust Index (TI)
-- Governance Analytics
-- PDF Reports
-- REST APIs
-- Evaluation History
-- Hugging Face Dataset Integration
-- Kaggle Dataset Integration
+### AI Compass
 
-### Future
+AI Maturity & Readiness Assessment
 
-- OpenVals Cloud
-- Enterprise Governance
-- Continuous AI Validation
-- Team Workspaces
-- Trust Intelligence Dashboard
-- AI Certification Framework
+### DrPinnacle
+
+AI Strategy, Governance & Advisory
+
+### OpenVals Cloud (Coming Soon)
+
+Continuous AI Validation Platform
 
 ---
 
@@ -336,6 +380,22 @@ OpenVals is building the Trust Intelligence Layer for AI.
 The future of AI is not determined by which model is largest.
 
 The future belongs to AI systems that can be measured, validated, governed, and trusted.
+
+## Evaluation vs Validation
+
+Most platforms evaluate AI.
+
+OpenVals validates trust.
+
+Evaluation answers:
+
+"How well does the model perform?"
+
+Validation answers:
+
+"Can the model be trusted in production?"
+
+OpenVals was built around this distinction.
 
 ---
 
