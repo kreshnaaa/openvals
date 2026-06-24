@@ -43,6 +43,7 @@ from openvals.advisor.trust_profile import build_trust_profile
 from openvals.models.ollama_model import (
     OllamaModel
 )
+from openvals.models.discovery import discover_providers
 
 from openvals.benchmarking.benchmark import (
     BenchmarkRunner
@@ -84,19 +85,33 @@ app = typer.Typer(
 
 @app.command()
 def version():
-
     """
     Show OpenVals version.
     """
-
     typer.echo(
 
         f"OpenVals v{__version__} "
         f"built by DrPinnacle "
         f"(https://drpinnacle.com) "
         f"Vishwanath Akuthota"
-
     )
+
+@app.command("providers")
+def providers_cli():
+    """
+    Show configured AI model providers.
+    """
+    providers = discover_providers()
+    typer.echo("\nOpenVals Provider Status\n")
+    for name, data in providers.items():
+        status = "Configured" if data["configured"] else "Not Configured"
+        typer.echo(f"{name:<12} : {status}")
+        models = data.get("models", [])
+        if models:
+            typer.echo(f"Models       : {len(models)}")
+            for model in models:
+                typer.echo(f"  → {model}")
+        typer.echo("")
 
 # =========================================================
 # BENCHMARK
@@ -104,7 +119,6 @@ def version():
 
 @app.command("benchmark")
 def benchmark(
-
     dataset: str = typer.Option(
         ...,
         help="Dataset name"
