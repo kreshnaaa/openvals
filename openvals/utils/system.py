@@ -1,10 +1,8 @@
 import os
 import platform
 
-
 def get_cpu_count():
     return os.cpu_count() or 1
-
 
 def get_memory_gb():
     try:
@@ -38,7 +36,6 @@ def get_memory_gb():
         return None
 
     return None
-
 
 def recommend_max_workers(
     mode="standard",

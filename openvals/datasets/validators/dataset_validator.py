@@ -236,9 +236,7 @@ def print_validation_report(result):
     )
 
     if quality["warnings"]:
-
         print("\nWarnings:")
-
         for warning in quality[
             "warnings"
         ]:
@@ -254,9 +252,7 @@ def print_validation_report(result):
 # =========================================================
 
 def validate_dataset_object(dataset):
-
     sample_count = len(dataset)
-
     schema_result = validate_schema(
         dataset
     )

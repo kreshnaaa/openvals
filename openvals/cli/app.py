@@ -25,6 +25,9 @@ from openvals.advisor.trust_workflow import (
 from openvals.advisor.model_catalog import (
     get_model_catalog
 )
+from openvals.models.provider_config import (
+    get_provider_env_vars
+)
 
 from openvals.datasets.registry import (
     DATASETS
@@ -72,13 +75,11 @@ from openvals.explainability.trust_explain import (
 # =========================================================
 
 app = typer.Typer(
-
     help=
-    "OpenVals - AI Evaluation & "
-    "Trust Intelligence Framework"
+    "OpenVals - "
+    "Secure, Govern, scale and TRUST"
 
 )
-
 # =========================================================
 # VERSION
 # =========================================================
@@ -102,10 +103,26 @@ def providers_cli():
     Show configured AI model providers.
     """
     providers = discover_providers()
+    provider_env = {
+        "openai": "OPENAI_API_KEY",
+        "anthropic": "ANTHROPIC_API_KEY",
+        "gemini": "GEMINI_API_KEY or GOOGLE_API_KEY"
+    }
     typer.echo("\nOpenVals Provider Status\n")
     for name, data in providers.items():
-        status = "Configured" if data["configured"] else "Not Configured"
+        status = (
+            "Configured"
+            if data["configured"]
+            else "Not Configured"
+        )
         typer.echo(f"{name:<12} : {status}")
+        if not data["configured"]:
+            env_vars = get_provider_env_vars(name)
+            if env_vars:
+                typer.echo(
+                    f"Required Env : {','.join(env_vars)}"
+                )
+
         models = data.get("models", [])
         if models:
             typer.echo(f"Models       : {len(models)}")
