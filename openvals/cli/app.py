@@ -69,11 +69,12 @@ from openvals.utils.paths import (
 from openvals.explainability.trust_explain import (
     print_trust_workflow_explanation
 )
-
+from openvals.utils.system import (
+    get_system_profile
+)
 # =========================================================
 # TYPER APP
 # =========================================================
-
 app = typer.Typer(
     help=
     "OpenVals - "
@@ -83,7 +84,6 @@ app = typer.Typer(
 # =========================================================
 # VERSION
 # =========================================================
-
 @app.command()
 def version():
     """
@@ -96,7 +96,7 @@ def version():
         f"(https://drpinnacle.com) "
         f"Vishwanath Akuthota"
     )
-
+#providers
 @app.command("providers")
 def providers_cli():
     """
@@ -130,6 +130,34 @@ def providers_cli():
                 typer.echo(f"  → {model}")
         typer.echo("")
 
+# System finding command
+@app.command("system")
+def system_cli():
+    """
+    Show OpenVals system diagnostics.
+    """
+    profile = get_system_profile(
+        mode="standard",
+        model_count=1
+    )
+    typer.echo("\nOpenVals System Diagnostics\n")
+
+    typer.echo(
+        f"CPU Cores        : "
+        f"{profile.get('cpu_count')}"
+    )
+    typer.echo(
+        f"Memory GB        : "
+        f"{profile.get('memory_gb')}"
+    )
+    typer.echo(
+        f"Recommended Workers : "
+        f"{profile.get('recommended_max_workers')}"
+    )
+    typer.echo(
+        f"Mode             : "
+        f"{profile.get('mode')}"
+    )
 # =========================================================
 # BENCHMARK
 # =========================================================
