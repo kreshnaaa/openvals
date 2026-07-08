@@ -8,6 +8,9 @@ from openvals import __version__
 from openvals.datasets.loader import (
     load_builtin_dataset
 )
+from openvals.utils.system import get_system_profile
+from openvals.models.discovery import discover_providers
+from openvals.advisor.model_catalog import list_models
 
 from openvals.datasets.metadata import (
     load_dataset_metadata
@@ -39,9 +42,7 @@ from openvals.config.loader import (
 from openvals.advisor.recommendation_engine import (
     recommend_models
 )
-from openvals.advisor.usecase_loader import load_use_case_from_file
-from openvals.advisor.usecase_analyzer import analyze_use_case_text
-from openvals.advisor.trust_profile import build_trust_profile
+from openvals.diagnostics.doctor import run_doctor
 
 from openvals.models.ollama_model import (
     OllamaModel
@@ -96,6 +97,49 @@ def version():
         f"(https://drpinnacle.com) "
         f"Vishwanath Akuthota"
     )
+# =========================================================
+# DOCTOR
+@app.command("doctor")
+def doctor_cli():
+    report = run_doctor()
+    typer.echo("\nOpenVals Doctor\n")
+
+    typer.echo("Version")
+    typer.echo(f"OpenVals : {report['version'].get('openvals')}")
+    typer.echo(f"Python   : {report['version'].get('python')}")
+    typer.echo(f"Platform : {report['version'].get('platform')}")
+    typer.echo(f"Arch     : {report['version'].get('architecture')}")
+
+    typer.echo("\nSystem")
+    typer.echo(f"CPU Cores           : {report['system'].get('cpu_count')}")
+    typer.echo(f"Memory GB           : {report['system'].get('memory_gb')}")
+    typer.echo(f"Recommended Workers : {report['system'].get('recommended_max_workers')}")
+
+    typer.echo("\nProviders")
+    for name, data in report["providers"].items():
+        status = "OK" if data.get("configured") else "Missing"
+        typer.echo(f"{name:<12} : {status}")
+
+    typer.echo("\nModels")
+    for model in report["installed_models"]:
+        typer.echo(f"→ {model}")
+    typer.echo(f"Installed Models    : {len(report['installed_models'])}")
+
+    typer.echo("\nDatasets")
+    for dataset in report["datasets"]:
+        typer.echo(f"✓ {dataset}")
+
+    typer.echo("\nConfigs")
+    for config in report["configs"]:
+        typer.echo(f"✓ {config}")
+
+    typer.echo("\nOverall Health")
+    if report["health"]["ready"]:
+        typer.echo("Status              : Ready for Benchmarking")
+    else:
+        typer.echo("Status              : Setup incomplete")
+        for issue in report["health"]["issues"]:
+            typer.echo(f"⚠ {issue}")
 #providers
 @app.command("providers")
 def providers_cli():
@@ -160,8 +204,6 @@ def system_cli():
     )
 # =========================================================
 # BENCHMARK
-# =========================================================
-
 @app.command("benchmark")
 def benchmark(
     dataset: str = typer.Option(
