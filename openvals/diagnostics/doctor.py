@@ -1,4 +1,4 @@
-from openvals.utils.system import get_system_profile
+from openvals.diagnostics.system import get_detailed_system_profile
 
 from openvals.models.discovery import discover_providers
 from openvals.advisor.model_catalog import list_models
@@ -13,7 +13,7 @@ def run_doctor():
     Run OpenVals diagnostics and return a complete health profile.
     """
     version = get_version_info()
-    system = get_system_profile(
+    system = get_detailed_system_profile(
         mode="standard",
         model_count=1
     )
