@@ -1,3 +1,4 @@
+from openvals.diagnostics.models import collect_installed_models
 from openvals.diagnostics.system import get_detailed_system_profile
 
 from openvals.models.discovery import discover_providers
@@ -19,7 +20,11 @@ def run_doctor():
     )
 
     providers = discover_providers()
-    installed_models = list_models()
+    model_inventory = collect_installed_models(providers)
+    installed_models = [
+        model["name"]
+        for model in model_inventory
+    ]
     datasets = discover_datasets()
     configs = discover_configs()
     health = compute_health(
@@ -33,6 +38,7 @@ def run_doctor():
         "system": system,
         "providers": providers,
         "installed_models": installed_models,
+        "model_inventory": model_inventory,
         "datasets": datasets,
         "configs": configs,
         "health": health
