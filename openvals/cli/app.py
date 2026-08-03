@@ -101,6 +101,9 @@ def version():
 # DOCTOR
 @app.command("doctor")
 def doctor_cli():
+    """
+    Show Environment Readiness.
+    """
     report = run_doctor()
     typer.echo("\nOpenVals Doctor\n")
 
