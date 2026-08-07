@@ -147,36 +147,69 @@ def doctor_cli():
 @app.command("providers")
 def providers_cli():
     """
-    Show configured AI model providers.
+    Show AI provider capability intelligence.
     """
     providers = discover_providers()
-    provider_env = {
-        "openai": "OPENAI_API_KEY",
-        "anthropic": "ANTHROPIC_API_KEY",
-        "gemini": "GEMINI_API_KEY or GOOGLE_API_KEY"
-    }
-    typer.echo("\nOpenVals Provider Status\n")
+    typer.echo(
+        "\nOpenVals Provider Intelligence\n"
+    )
     for name, data in providers.items():
-        status = (
-            "Configured"
-            if data["configured"]
-            else "Not Configured"
+        typer.echo(
+            f"{name.upper()}"
         )
-        typer.echo(f"{name:<12} : {status}")
-        if not data["configured"]:
-            env_vars = get_provider_env_vars(name)
-            if env_vars:
-                typer.echo(
-                    f"Required Env : {','.join(env_vars)}"
-                )
-
-        models = data.get("models", [])
+        typer.echo(
+            f"Type             : "
+            f"{data.get('type', 'unknown')}"
+        )
+        typer.echo(
+            f"Configured       : "
+            f"{format_status(data.get('configured'))}"
+        )
+        typer.echo(
+            f"Reachable        : "
+            f"{format_status(data.get('reachable'))}"
+        )
+        typer.echo(
+            f"Authenticated    : "
+            f"{format_status(data.get('authenticated'))}"
+        )
+        typer.echo(
+            f"Benchmark Ready  : "
+            f"{format_status(data.get('benchmark_ready'))}"
+        )
+        models = data.get(
+            "models",
+            []
+        )
+        typer.echo(
+            f"Models           : "
+            f"{len(models)}"
+        )
         if models:
-            typer.echo(f"Models       : {len(models)}")
             for model in models:
-                typer.echo(f"  → {model}")
+                typer.echo(
+                    f"  → {model}"
+                )
+        issues = data.get(
+            "issues",
+            []
+        )
+        if issues:
+            typer.echo(
+                "Issues:"
+            )
+            for issue in issues:
+                typer.echo(
+                    f"  ⚠ {issue}"
+                )
         typer.echo("")
-
+# CLI utility functions
+def format_status(value):
+    if value is True:
+        return "Yes"
+    if value is False:
+        return "No"
+    return "Unknown"
 # System finding command
 @app.command("system")
 def system_cli():
