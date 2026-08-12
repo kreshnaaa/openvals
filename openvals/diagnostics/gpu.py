@@ -1,10 +1,16 @@
 import platform
 import shutil
 import subprocess
-from typing import Any
 
 
-def _run_command(command: list[str]) -> tuple[bool, str]:
+def _run_command(command):
+    """
+    Run a system command safely.
+
+    Returns stdout when successful,
+    otherwise returns None.
+    """
+
     try:
         result = subprocess.run(
             command,
@@ -14,79 +20,158 @@ def _run_command(command: list[str]) -> tuple[bool, str]:
             check=False,
         )
 
-        if result.returncode != 0:
-            return False, result.stderr.strip()
+        if result.returncode == 0:
+            return result.stdout.strip()
 
-        return True, result.stdout.strip()
+    except (
+        FileNotFoundError,
+        subprocess.SubprocessError,
+    ):
+        pass
 
-    except (FileNotFoundError, subprocess.SubprocessError):
-        return False, ""
+    return None
 
 
-def detect_gpu() -> dict[str, Any]:
+# =========================================================
+# NVIDIA
+# =========================================================
+
+def detect_nvidia_gpu():
     """
-    Detect available GPU acceleration.
-
-    Supports:
-    - NVIDIA CUDA through nvidia-smi
-    - Apple Silicon through platform detection
-    - Generic fallback
+    Detect NVIDIA GPUs using nvidia-smi.
     """
 
-    system = platform.system()
-    machine = platform.machine().lower()
+    if not shutil.which("nvidia-smi"):
+        return None
 
-    if shutil.which("nvidia-smi"):
-        success, output = _run_command(
-            [
-                "nvidia-smi",
-                "--query-gpu=name,memory.total,driver_version",
-                "--format=csv,noheader,nounits",
-            ]
-        )
+    output = _run_command(
+        [
+            "nvidia-smi",
+            "--query-gpu=name,memory.total",
+            "--format=csv,noheader,nounits",
+        ]
+    )
 
-        if success and output:
-            devices = []
+    if not output:
+        return None
 
-            for line in output.splitlines():
-                parts = [part.strip() for part in line.split(",")]
+    devices = []
 
-                devices.append(
-                    {
-                        "name": parts[0] if len(parts) > 0 else "NVIDIA GPU",
-                        "memory_mb": (
-                            float(parts[1]) if len(parts) > 1 else None
-                        ),
-                        "driver_version": (
-                            parts[2] if len(parts) > 2 else None
-                        ),
-                    }
+    for line in output.splitlines():
+
+        parts = [
+            part.strip()
+            for part in line.split(",")
+        ]
+
+        if not parts:
+            continue
+
+        device = {
+            "name": parts[0],
+            "memory_gb": None,
+        }
+
+        if len(parts) > 1:
+            try:
+                memory_mb = float(parts[1])
+
+                device["memory_gb"] = round(
+                    memory_mb / 1024,
+                    2,
                 )
 
-            return {
-                "available": True,
-                "backend": "cuda",
-                "vendor": "nvidia",
-                "devices": devices,
-            }
+            except ValueError:
+                pass
 
-    if system == "Darwin" and machine in {"arm64", "aarch64"}:
-        return {
-            "available": True,
-            "backend": "metal",
-            "vendor": "apple",
-            "devices": [
-                {
-                    "name": "Apple Silicon GPU",
-                    "memory_mb": None,
-                    "driver_version": None,
-                }
-            ],
-        }
+        devices.append(device)
+
+    if not devices:
+        return None
+
+    return {
+        "available": True,
+        "backend": "cuda",
+        "vendor": "nvidia",
+        "devices": devices,
+    }
+
+
+# =========================================================
+# APPLE SILICON / METAL
+# =========================================================
+
+def detect_apple_gpu():
+    """
+    Detect Apple Silicon GPU capability.
+
+    Apple Silicon uses unified memory, so GPU memory
+    should not be reported as dedicated VRAM.
+    """
+
+    if platform.system() != "Darwin":
+        return None
+
+    machine = platform.machine().lower()
+
+    if machine not in (
+        "arm64",
+        "aarch64",
+    ):
+        return None
+
+    chip = _run_command(
+        [
+            "sysctl",
+            "-n",
+            "machdep.cpu.brand_string",
+        ]
+    )
+
+    if not chip:
+        chip = "Apple Silicon"
+
+    return {
+        "available": True,
+        "backend": "metal",
+        "vendor": "apple",
+        "devices": [
+            {
+                "name": chip,
+                "memory_gb": None,
+            }
+        ],
+    }
+
+
+# =========================================================
+# GPU DETECTION
+# =========================================================
+
+def get_gpu_profile():
+    """
+    Detect the available GPU/acceleration backend.
+
+    Detection order:
+
+    1. NVIDIA / CUDA
+    2. Apple Silicon / Metal
+    3. CPU fallback
+    """
+
+    nvidia = detect_nvidia_gpu()
+
+    if nvidia:
+        return nvidia
+
+    apple = detect_apple_gpu()
+
+    if apple:
+        return apple
 
     return {
         "available": False,
-        "backend": None,
+        "backend": "cpu",
         "vendor": None,
         "devices": [],
     }

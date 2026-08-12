@@ -97,7 +97,6 @@ def version():
         f"(https://drpinnacle.com) "
         f"Vishwanath Akuthota"
     )
-# =========================================================
 # DOCTOR
 @app.command("doctor")
 def doctor_cli():
@@ -105,6 +104,10 @@ def doctor_cli():
     Show Environment Readiness.
     """
     report = run_doctor()
+
+    system = report.get("system", {})
+    gpu = system.get("gpu", {})
+    disk = system.get("disk", {})
     typer.echo("\nOpenVals Doctor\n")
 
     typer.echo("Version")
@@ -114,9 +117,29 @@ def doctor_cli():
     typer.echo(f"Arch     : {report['version'].get('architecture')}")
 
     typer.echo("\nSystem")
-    typer.echo(f"CPU Cores           : {report['system'].get('cpu_count')}")
-    typer.echo(f"Memory GB           : {report['system'].get('memory_gb')}")
-    typer.echo(f"Recommended Workers : {report['system'].get('recommended_max_workers')}")
+    typer.echo(f"CPU Cores           : {system.get('cpu_count')}")
+    typer.echo(f"Memory GB           : {system.get('memory_gb')}")
+    typer.echo(f"Memory Available GB : {system.get('memory_available_gb')}")
+    typer.echo(f"Memory Used         : {system.get('memory_percent_used')}%")
+    typer.echo(f"GPU Count           : {gpu.get('count', 0)}")
+    typer.echo(f"Disk Space GB       : {disk.get('space_gb', 0)}")
+    typer.echo(f"Recommended Workers : {system.get('recommended_max_workers')}")
+
+    typer.echo("\nGPU / Acceleration")
+    typer.echo(f"Available           : {'Yes' if gpu.get('available') else 'No'}")
+    typer.echo(f"Backend             : {gpu.get('backend', 'unknown')}")
+    typer.echo(f"Vendor              : {gpu.get('vendor', 'unknown')}")
+    devices = gpu.get("devices", [])
+    if devices:
+        for index, device in enumerate(devices, start=1):
+            typer.echo(f"Device {index}            : {device.get('name', 'unknown')}")
+            if device.get("memory_gb") is not None:
+                typer.echo(f"GPU Memory GB       : {device.get('memory_gb')}")
+
+    typer.echo("\nDisk")
+    typer.echo(f"Disk Total GB       : {disk.get('total_gb')}")
+    typer.echo(f"Disk Free GB        : {disk.get('free_gb')}")
+    typer.echo(f"Disk Used           : {disk.get('percent_used')}%")
 
     typer.echo("\nProviders")
     for name, data in report["providers"].items():
@@ -211,34 +234,86 @@ def format_status(value):
         return "No"
     return "Unknown"
 # System finding command
+from openvals.diagnostics.system import (get_detailed_system_profile)
 @app.command("system")
 def system_cli():
     """
     Show OpenVals system diagnostics.
     """
-    profile = get_system_profile(
-        mode="standard",
-        model_count=1
-    )
+    profile = get_detailed_system_profile()
     typer.echo("\nOpenVals System Diagnostics\n")
-
     typer.echo(
-        f"CPU Cores        : "
+        f"CPU Cores           : "
         f"{profile.get('cpu_count')}"
     )
     typer.echo(
-        f"Memory GB        : "
+        f"Memory GB           : "
         f"{profile.get('memory_gb')}"
+    )
+    typer.echo(
+        f"Memory Available GB : "
+        f"{profile.get('memory_available_gb')}"
+    )
+    typer.echo(
+        f"Memory Used         : "
+        f"{profile.get('memory_percent_used')}%"
     )
     typer.echo(
         f"Recommended Workers : "
         f"{profile.get('recommended_max_workers')}"
     )
     typer.echo(
-        f"Mode             : "
+        f"Mode                : "
         f"{profile.get('mode')}"
     )
-# =========================================================
+    # GPU
+    gpu = profile.get("gpu", {})
+    typer.echo("\nGPU / Acceleration")
+    typer.echo(
+        f"Available           : "
+        f"{'Yes' if gpu.get('available') else 'No'}"
+    )
+    typer.echo(
+        f"Backend             : "
+        f"{gpu.get('backend', 'unknown')}"
+    )
+    typer.echo(
+        f"Vendor              : "
+        f"{gpu.get('vendor') or 'unknown'}"
+    )
+
+    devices = gpu.get("devices", [])
+
+    if devices:
+        for index, device in enumerate(
+            devices,
+            start=1,
+        ):
+            typer.echo(
+                f"Device {index}            : "
+                f"{device.get('name', 'unknown')}"
+            )
+
+            if device.get("memory_gb") is not None:
+                typer.echo(
+                    f"GPU Memory GB       : "
+                    f"{device.get('memory_gb')}"
+                )
+    # DISK
+    disk = profile.get("disk", {})
+    typer.echo("\nDisk")
+    typer.echo(
+        f"Total GB            : "
+        f"{disk.get('total_gb')}"
+    )
+    typer.echo(
+        f"Free GB             : "
+        f"{disk.get('free_gb')}"
+    )
+    typer.echo(
+        f"Used                : "
+        f"{disk.get('percent_used')}%"
+    )
 # BENCHMARK
 @app.command("benchmark")
 def benchmark(

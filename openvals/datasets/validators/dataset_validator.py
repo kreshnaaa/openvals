@@ -1,15 +1,12 @@
 import json
 import csv
 from pathlib import Path
-
 from openvals.datasets.validators.schema_validator import (
     validate_schema
 )
-
 from openvals.datasets.validators.quality_validator import (
     validate_quality
 )
-
 def load_json_dataset(path):
 
     with open(
@@ -28,11 +25,7 @@ def load_json_dataset(path):
 
     return data
 
-
-# =========================================================
 # LOAD CSV
-# =========================================================
-
 def load_csv_dataset(path):
 
     rows = []
