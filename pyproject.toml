@@ -1,18 +1,18 @@
 [build-system]
-requires = ["setuptools>=69.0", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvals"
 version = "0.6.0"
-license = "LicenseRef-DPCL-CE
+license = "LicenseRef-DPCL-CE"
 license-files = ["LICENSE"]
 
 description = "Open source AI evaluation, validation, benchmarking, recommendation engine and trust layer for LLMs"
 
 readme = "README.md"
 
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 authors = [
     { name = "Vishwanath Akuthota" }
@@ -37,8 +37,7 @@ keywords = [
 
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Intended Audience :: AI Engineers, AIOps, Developers",
-    "License :: Dr.Pinnacle Community Edition License (DPCL-CE)",
+    "Intended Audience :: AI Engineers, AIOps, Developers",    
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -53,7 +52,9 @@ dependencies = [
     "rich",
     "pyyaml",
     "sentence-transformers",
-    "matplotlib"
+    "matplotlib",
+    "requests",
+    "psutil",
 ]
 
 [project.optional-dependencies]
